@@ -43,38 +43,18 @@
 
 <hr>
 
-<!-- Formulario para procesar Historia en Bruto -->
+<!-- Botón para procesar Historia en Bruto -->
 <h4>Procesar Historia en Bruto</h4>
-<form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
-    {{ form_procesar_historia.hidden_tag() }}
-    <div>
-        {{ form_procesar_historia.historia_bruto.label }}<br>
-        {{ form_procesar_historia.historia_bruto(rows=5) }}<br>
-        {% for error in form_procesar_historia.historia_bruto.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form_procesar_historia.submit() }}
-    </div>
+<form method="GET" action="{{ url_for('main.procesar_historia_bruto', atencion_id=atencion.id) }}">
+    <button type="submit">Ingresar Historia en Bruto</button>
 </form>
 
 <hr>
 
-<!-- Formulario para procesar Detalle de Atención en Bruto -->
+<!-- Botón para procesar Detalle de Atención en Bruto -->
 <h4>Procesar Detalle de Atención en Bruto</h4>
-<form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
-    {{ form_procesar_detalle.hidden_tag() }}
-    <div>
-        {{ form_procesar_detalle.detalle_bruto.label }}<br>
-        {{ form_procesar_detalle.detalle_bruto(rows=5) }}<br>
-        {% for error in form_procesar_detalle.detalle_bruto.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form_procesar_detalle.submit() }}
-    </div>
+<form method="GET" action="{{ url_for('main.procesar_detalle_bruto', atencion_id=atencion.id) }}">
+    <button type="submit">Ingresar Detalle de Atención en Bruto</button>
 </form>
 
 {% endblock %}

@@ -87,6 +87,41 @@ def detalle_atencion(atencion_id):
         form_procesar_detalle=form_procesar_detalle
     )
 
+@main.route('/procesar_historia_bruto/<string:atencion_id>', methods=['GET', 'POST'])
+@login_required
+def procesar_historia_bruto(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    paciente = atencion.paciente
+
+    form = ProcesarHistoriaBrutoForm()
+    if form.validate_on_submit():
+        texto_bruto = form.historia_bruto.data
+        historia_actualizada = procesar_historia(paciente.historia or '', texto_bruto)
+        paciente.historia = historia_actualizada.text
+        db.session.commit()
+        flash('Historia procesada y actualizada.', 'success')
+        return redirect(url_for('main.detalle_atencion', atencion_id=atencion_id))
+
+    return render_template('procesar_historia_bruto.html', form=form, atencion=atencion, paciente=paciente)
+
+@main.route('/procesar_detalle_bruto/<string:atencion_id>', methods=['GET', 'POST'])
+@login_required
+def procesar_detalle_bruto(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    paciente = atencion.paciente
+
+    form = ProcesarDetalleBrutoForm()
+    if form.validate_on_submit():
+        texto_bruto = form.detalle_bruto.data
+        detalle_actualizado = procesar_detalle_atencion(
+            paciente.historia or '', atencion.detalle or '', texto_bruto)
+        atencion.detalle = detalle_actualizado.text
+        db.session.commit()
+        flash('Detalle de atención procesado y actualizado.', 'success')
+        return redirect(url_for('main.detalle_atencion', atencion_id=atencion_id))
+
+    return render_template('procesar_detalle_bruto.html', form=form, atencion=atencion, paciente=paciente)
+
 def register_error_handlers(app):
     from flask import render_template
 
