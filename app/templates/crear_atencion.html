@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Crear Nueva Atención{% endblock %}
+{% block content %}
+<h2>Crear Nueva Atención</h2>
+<form method="post" action="{{ url_for('main.crear_atencion') }}">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.run.label }}<br>
+        {{ form.run(size=32) }}<br>
+        {% for error in form.run.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <br>
+    <div>
+        {{ form.submit() }}
+    </div>
+</form>
+{% endblock %}

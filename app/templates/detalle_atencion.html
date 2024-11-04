@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Atención{% endblock %}
+
+{% block content %}
+<h2>Detalle de Atención</h2>
+
+<h3>Paciente: {{ paciente.run }}</h3>
+
+<!-- Formulario para actualizar la Historia Clínica -->
+<h4>Actualizar Historia Clínica</h4>
+<form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+    {{ form_historia.hidden_tag() }}
+    <div>
+        {{ form_historia.historia.label }}<br>
+        {{ form_historia.historia(rows=5) }}<br>
+        {% for error in form_historia.historia.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form_historia.submit() }}
+    </div>
+</form>
+
+<hr>
+
+<!-- Formulario para actualizar el Detalle de Atención Actual -->
+<h4>Actualizar Detalle de Atención Actual</h4>
+<form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+    {{ form_detalle.hidden_tag() }}
+    <div>
+        {{ form_detalle.detalle.label }}<br>
+        {{ form_detalle.detalle(rows=5) }}<br>
+        {% for error in form_detalle.detalle.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form_detalle.submit() }}
+    </div>
+</form>
+
+<hr>
+
+<!-- Formulario para procesar Historia en Bruto -->
+<h4>Procesar Historia en Bruto</h4>
+<form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+    {{ form_procesar_historia.hidden_tag() }}
+    <div>
+        {{ form_procesar_historia.historia_bruto.label }}<br>
+        {{ form_procesar_historia.historia_bruto(rows=5) }}<br>
+        {% for error in form_procesar_historia.historia_bruto.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form_procesar_historia.submit() }}
+    </div>
+</form>
+
+<hr>
+
+<!-- Formulario para procesar Detalle de Atención en Bruto -->
+<h4>Procesar Detalle de Atención en Bruto</h4>
+<form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+    {{ form_procesar_detalle.hidden_tag() }}
+    <div>
+        {{ form_procesar_detalle.detalle_bruto.label }}<br>
+        {{ form_procesar_detalle.detalle_bruto(rows=5) }}<br>
+        {% for error in form_procesar_detalle.detalle_bruto.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form_procesar_detalle.submit() }}
+    </div>
+</form>
+
+{% endblock %}
