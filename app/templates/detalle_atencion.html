@@ -3,58 +3,136 @@
 {% block title %}Detalle de Atención{% endblock %}
 
 {% block content %}
-<h2>Detalle de Atención</h2>
+<div class="container mt-4">
+    <h2>Detalle de Atención</h2>
 
-<h3>Paciente: {{ paciente.run }}</h3>
+    <h3>Paciente: {{ paciente.run }}</h3>
 
-<!-- Formulario para actualizar la Historia Clínica -->
-<h4>Actualizar Historia Clínica</h4>
-<form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
-    {{ form_historia.hidden_tag() }}
-    <div>
-        {{ form_historia.historia.label }}<br>
-        {{ form_historia.historia(rows=5) }}<br>
-        {% for error in form_historia.historia.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
+    <!-- Formulario para actualizar la Historia Clínica -->
+    <h4>Actualizar Historia Clínica</h4>
+    <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+        {{ form_historia.hidden_tag() }}
+        <div class="form-group">
+            {{ form_historia.historia.label }}
+            {{ form_historia.historia(class="form-control", rows=5) }}
+            {% for error in form_historia.historia.errors %}
+                <span class="text-danger">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form_historia.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+
+    <hr>
+
+    <!-- Formulario para actualizar el Detalle de Atención Actual -->
+    <h4>Actualizar Detalle de Atención Actual</h4>
+    <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+        {{ form_detalle.hidden_tag() }}
+        <div class="form-group">
+            {{ form_detalle.detalle.label }}
+            {{ form_detalle.detalle(class="form-control", rows=5) }}
+            {% for error in form_detalle.detalle.errors %}
+                <span class="text-danger">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form_detalle.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+
+    <hr>
+
+    <!-- Botón para abrir el modal de Historia en Bruto -->
+    <h4>Procesar Historia en Bruto</h4>
+    <button type="button" class="btn btn-secondary mb-3" data-toggle="modal" data-target="#historiaBrutoModal">
+        Ingresar Historia en Bruto
+    </button>
+
+    <!-- Modal de Historia en Bruto -->
+    <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="POST" action="{{ url_for('main.procesar_historia_bruto_modal', atencion_id=atencion.id) }}">
+            {{ form_procesar_historia.hidden_tag() }}
+            <div class="modal-header">
+              <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Historia en Bruto</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                {{ form_procesar_historia.historia_bruto.label }}
+                {{ form_procesar_historia.historia_bruto(class="form-control", rows=5) }}
+                {% for error in form_procesar_historia.historia_bruto.errors %}
+                    <span class="text-danger">[{{ error }}]</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+              {{ form_procesar_historia.submit(class="btn btn-primary") }}
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <div>
-        {{ form_historia.submit() }}
+
+    <hr>
+
+    <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
+    <h4>Procesar Detalle de Atención en Bruto</h4>
+    <button type="button" class="btn btn-secondary mb-3" data-toggle="modal" data-target="#detalleBrutoModal">
+        Ingresar Detalle de Atención en Bruto
+    </button>
+
+    <!-- Modal de Detalle de Atención en Bruto -->
+    <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="POST" action="{{ url_for('main.procesar_detalle_bruto_modal', atencion_id=atencion.id) }}">
+            {{ form_procesar_detalle.hidden_tag() }}
+            <div class="modal-header">
+              <h5 class="modal-title" id="detalleBrutoModalLabel">Procesar Detalle de Atención en Bruto</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                {{ form_procesar_detalle.detalle_bruto.label }}
+                {{ form_procesar_detalle.detalle_bruto(class="form-control", rows=5) }}
+                {% for error in form_procesar_detalle.detalle_bruto.errors %}
+                    <span class="text-danger">[{{ error }}]</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+              {{ form_procesar_detalle.submit(class="btn btn-primary") }}
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-</form>
+</div>
+{% endblock %}
 
-<hr>
-
-<!-- Formulario para actualizar el Detalle de Atención Actual -->
-<h4>Actualizar Detalle de Atención Actual</h4>
-<form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
-    {{ form_detalle.hidden_tag() }}
-    <div>
-        {{ form_detalle.detalle.label }}<br>
-        {{ form_detalle.detalle(rows=5) }}<br>
-        {% for error in form_detalle.detalle.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form_detalle.submit() }}
-    </div>
-</form>
-
-<hr>
-
-<!-- Botón para procesar Historia en Bruto -->
-<h4>Procesar Historia en Bruto</h4>
-<form method="GET" action="{{ url_for('main.procesar_historia_bruto', atencion_id=atencion.id) }}">
-    <button type="submit">Ingresar Historia en Bruto</button>
-</form>
-
-<hr>
-
-<!-- Botón para procesar Detalle de Atención en Bruto -->
-<h4>Procesar Detalle de Atención en Bruto</h4>
-<form method="GET" action="{{ url_for('main.procesar_detalle_bruto', atencion_id=atencion.id) }}">
-    <button type="submit">Ingresar Detalle de Atención en Bruto</button>
-</form>
-
+{% block scripts %}
+<script>
+    $(document).ready(function(){
+        // Indicador de carga para el modal de Historia en Bruto
+        $('#historiaBrutoModal form').on('submit', function(){
+            $('#historiaBrutoModal .modal-footer button, #historiaBrutoModal .modal-header button').prop('disabled', true);
+            $('#historiaBrutoModal .modal-footer .btn-primary').text('Procesando...');
+        });
+        // Indicador de carga para el modal de Detalle de Atención en Bruto
+        $('#detalleBrutoModal form').on('submit', function(){
+            $('#detalleBrutoModal .modal-footer button, #detalleBrutoModal .modal-header button').prop('disabled', true);
+            $('#detalleBrutoModal .modal-footer .btn-primary').text('Procesando...');
+        });
+    });
+</script>
 {% endblock %}
