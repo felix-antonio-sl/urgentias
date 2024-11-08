@@ -14,17 +14,17 @@
             <h4>Actualizar Historia Clínica</h4>
             <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
                 {{ form_historia.hidden_tag() }}
-                <div class="form-group">
-                    {{ form_historia.historia.label }}
+                <div class="mb-3">
+                    {{ form_historia.historia.label(class="form-label") }}
                     {{ form_historia.historia(class="form-control", rows=10) }}
                     {% for error in form_historia.historia.errors %}
-                        <span class="text-danger">[{{ error }}]</span>
+                        <div class="text-danger">[{{ error }}]</div>
                     {% endfor %}
                 </div>
-                <div class="form-group d-flex">
-                    {{ form_historia.submit(class="btn btn-primary mr-2") }}
+                <div class="d-flex">
+                    {{ form_historia.submit(class="btn btn-primary me-2") }}
                     <!-- Botón para abrir el modal de Historia en Bruto -->
-                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#historiaBrutoModal">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
                         Procesar
                     </button>
                 </div>
@@ -36,17 +36,17 @@
             <h4>Actualizar Detalle de Atención Actual</h4>
             <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
                 {{ form_detalle.hidden_tag() }}
-                <div class="form-group">
-                    {{ form_detalle.detalle.label }}
+                <div class="mb-3">
+                    {{ form_detalle.detalle.label(class="form-label") }}
                     {{ form_detalle.detalle(class="form-control", rows=10) }}
                     {% for error in form_detalle.detalle.errors %}
-                        <span class="text-danger">[{{ error }}]</span>
+                        <div class="text-danger">[{{ error }}]</div>
                     {% endfor %}
                 </div>
-                <div class="form-group d-flex">
-                    {{ form_detalle.submit(class="btn btn-primary mr-2") }}
+                <div class="d-flex">
+                    {{ form_detalle.submit(class="btn btn-primary me-2") }}
                     <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
-                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detalleBrutoModal">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
                         Procesar
                     </button>
                 </div>
@@ -63,21 +63,19 @@
             {{ form_procesar_historia.hidden_tag() }}
             <div class="modal-header">
               <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Historia en Bruto</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                <span aria-hidden="true">&times;</span>
-              </button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-              <div class="form-group">
-                {{ form_procesar_historia.historia_bruto.label }}
+              <div class="mb-3">
+                {{ form_procesar_historia.historia_bruto.label(class="form-label") }}
                 {{ form_procesar_historia.historia_bruto(class="form-control", rows=5) }}
                 {% for error in form_procesar_historia.historia_bruto.errors %}
-                    <span class="text-danger">[{{ error }}]</span>
+                    <div class="text-danger">[{{ error }}]</div>
                 {% endfor %}
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
               {{ form_procesar_historia.submit(class="btn btn-primary") }}
             </div>
           </form>
@@ -93,21 +91,19 @@
             {{ form_procesar_detalle.hidden_tag() }}
             <div class="modal-header">
               <h5 class="modal-title" id="detalleBrutoModalLabel">Procesar Detalle de Atención en Bruto</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                <span aria-hidden="true">&times;</span>
-              </button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-              <div class="form-group">
-                {{ form_procesar_detalle.detalle_bruto.label }}
+              <div class="mb-3">
+                {{ form_procesar_detalle.detalle_bruto.label(class="form-label") }}
                 {{ form_procesar_detalle.detalle_bruto(class="form-control", rows=5) }}
                 {% for error in form_procesar_detalle.detalle_bruto.errors %}
-                    <span class="text-danger">[{{ error }}]</span>
+                    <div class="text-danger">[{{ error }}]</div>
                 {% endfor %}
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
               {{ form_procesar_detalle.submit(class="btn btn-primary") }}
             </div>
           </form>
@@ -120,16 +116,22 @@
 
 {% block scripts %}
 <script>
-    $(document).ready(function(){
+    // Como estamos usando Bootstrap 5, necesitamos ajustar el código JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
         // Indicador de carga para el modal de Historia en Bruto
-        $('#historiaBrutoModal form').on('submit', function(){
-            $('#historiaBrutoModal .modal-footer button, #historiaBrutoModal .modal-header button').prop('disabled', true);
-            $('#historiaBrutoModal .modal-footer .btn-primary').text('Procesando...');
+        const historiaBrutoForm = document.querySelector('#historiaBrutoModal form');
+        historiaBrutoForm.addEventListener('submit', function() {
+            const modal = bootstrap.Modal.getInstance(document.querySelector('#historiaBrutoModal'));
+            modal._element.querySelectorAll('button').forEach(button => button.disabled = true);
+            modal._element.querySelector('.modal-footer .btn-primary').textContent = 'Procesando...';
         });
+
         // Indicador de carga para el modal de Detalle de Atención en Bruto
-        $('#detalleBrutoModal form').on('submit', function(){
-            $('#detalleBrutoModal .modal-footer button, #detalleBrutoModal .modal-header button').prop('disabled', true);
-            $('#detalleBrutoModal .modal-footer .btn-primary').text('Procesando...');
+        const detalleBrutoForm = document.querySelector('#detalleBrutoModal form');
+        detalleBrutoForm.addEventListener('submit', function() {
+            const modal = bootstrap.Modal.getInstance(document.querySelector('#detalleBrutoModal'));
+            modal._element.querySelectorAll('button').forEach(button => button.disabled = true);
+            modal._element.querySelector('.modal-footer .btn-primary').textContent = 'Procesando...';
         });
     });
 </script>

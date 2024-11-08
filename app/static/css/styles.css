@@ -1,90 +1,123 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+/* Estilos personalizados para Urgentias */
+
+/* Variables de colores */
+:root {
+    --primary-color: #00B2A9;  /* Teal */
+    --secondary-color: #4B0082; /* Indigo */
+    --accent-color: #FFD700;    /* Gold */
+    --text-color: #000000;      /* Black */
+    --background-color: #FFFFFF;/* White */
+    --highlight-color: #C71585; /* Medium Violet Red */
 }
 
+/* Aplicar el fondo blanco */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Estilos del encabezado */
 header {
-    background-color: #4CAF50;
-    padding: 10px 20px;
-    color: white;
+    background-color: var(--primary-color);
 }
 
 header h1 {
-    margin: 0;
-    display: inline-block;
+    color: var(--background-color);
 }
 
-nav {
-    display: inline-block;
-    float: right;
+header nav a {
+    color: var(--background-color);
 }
 
-nav a {
-    color: white;
-    margin-left: 15px;
-    text-decoration: none;
+header nav a:hover {
+    color: var(--accent-color);
 }
 
-nav a:hover {
-    text-decoration: underline;
+/* Estilos de botones */
+.btn-primary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
 }
 
-main {
-    padding: 20px;
+.btn-primary:hover {
+    background-color: var(--highlight-color);
+    border-color: var(--highlight-color);
 }
 
+.btn-secondary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--highlight-color);
+    border-color: var(--highlight-color);
+    color: var(--background-color);
+}
+
+/* Estilos de enlaces */
+a {
+    color: var(--secondary-color);
+}
+
+a:hover {
+    color: var(--highlight-color);
+}
+
+/* Estilos de pie de página */
 footer {
-    background-color: #f1f1f1;
-    padding: 10px 20px;
-    text-align: center;
+    background-color: var(--primary-color);
+    color: var(--background-color);
 }
 
-.flashes {
-    list-style-type: none;
-    padding: 0;
+/* Estilos de tablas */
+.table thead {
+    background-color: var(--primary-color);
+    color: var(--background-color);
 }
 
-.flashes li {
-    padding: 10px;
-    margin-bottom: 10px;
+.table tbody tr:hover {
+    background-color: var(--accent-color);
 }
 
-.flashes .success {
-    background-color: #d4edda;
-    color: #155724;
+/* Estilos de formularios */
+.form-label {
+    color: var(--text-color);
 }
 
-.flashes .error {
-    background-color: #f8d7da;
-    color: #721c24;
+.form-control {
+    border-color: var(--secondary-color);
 }
 
-.flashes .warning {
-    background-color: #fff3cd;
-    color: #856404;
+.form-control:focus {
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 0 0.2rem rgba(199, 21, 133, 0.25);
 }
 
-form div {
-    margin-bottom: 10px;
+/* Estilos de alertas */
+.alert-success {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border-color: var(--accent-color);
 }
 
-form input[type="text"],
-form input[type="password"],
-form textarea {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
+.alert-danger {
+    background-color: var(--highlight-color);
+    color: var(--background-color);
+    border-color: var(--highlight-color);
 }
 
-form input[type="submit"] {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    cursor: pointer;
+/* Estilos de modales */
+.modal-content {
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
-form input[type="submit"]:hover {
-    background-color: #45a049;
+.modal-header {
+    border-bottom-color: var(--secondary-color);
+}
+
+.modal-footer {
+    border-top-color: var(--secondary-color);
 }
