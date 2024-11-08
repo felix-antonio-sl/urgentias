@@ -8,48 +8,53 @@
 
     <h3>Paciente: {{ paciente.run }}</h3>
 
-    <!-- Formulario para actualizar la Historia Clínica -->
-    <h4>Actualizar Historia Clínica</h4>
-    <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
-        {{ form_historia.hidden_tag() }}
-        <div class="form-group">
-            {{ form_historia.historia.label }}
-            {{ form_historia.historia(class="form-control", rows=5) }}
-            {% for error in form_historia.historia.errors %}
-                <span class="text-danger">[{{ error }}]</span>
-            {% endfor %}
+    <div class="row">
+        <!-- Columna de Actualizar Historia Clínica -->
+        <div class="col-md-6">
+            <h4>Actualizar Historia Clínica</h4>
+            <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+                {{ form_historia.hidden_tag() }}
+                <div class="form-group">
+                    {{ form_historia.historia.label }}
+                    {{ form_historia.historia(class="form-control", rows=10) }}
+                    {% for error in form_historia.historia.errors %}
+                        <span class="text-danger">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group d-flex">
+                    {{ form_historia.submit(class="btn btn-primary mr-2") }}
+                    <!-- Botón para abrir el modal de Historia en Bruto -->
+                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#historiaBrutoModal">
+                        Procesar
+                    </button>
+                </div>
+            </form>
         </div>
-        <div>
-            {{ form_historia.submit(class="btn btn-primary") }}
+
+        <!-- Columna de Actualizar Detalle de Atención Actual -->
+        <div class="col-md-6">
+            <h4>Actualizar Detalle de Atención Actual</h4>
+            <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+                {{ form_detalle.hidden_tag() }}
+                <div class="form-group">
+                    {{ form_detalle.detalle.label }}
+                    {{ form_detalle.detalle(class="form-control", rows=10) }}
+                    {% for error in form_detalle.detalle.errors %}
+                        <span class="text-danger">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group d-flex">
+                    {{ form_detalle.submit(class="btn btn-primary mr-2") }}
+                    <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
+                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detalleBrutoModal">
+                        Procesar
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
-    <hr>
-
-    <!-- Formulario para actualizar el Detalle de Atención Actual -->
-    <h4>Actualizar Detalle de Atención Actual</h4>
-    <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
-        {{ form_detalle.hidden_tag() }}
-        <div class="form-group">
-            {{ form_detalle.detalle.label }}
-            {{ form_detalle.detalle(class="form-control", rows=5) }}
-            {% for error in form_detalle.detalle.errors %}
-                <span class="text-danger">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-        <div>
-            {{ form_detalle.submit(class="btn btn-primary") }}
-        </div>
-    </form>
-
-    <hr>
-
-    <!-- Botón para abrir el modal de Historia en Bruto -->
-    <h4>Procesar Historia en Bruto</h4>
-    <button type="button" class="btn btn-secondary mb-3" data-toggle="modal" data-target="#historiaBrutoModal">
-        Ingresar Historia en Bruto
-    </button>
-
+    <!-- Modales -->
     <!-- Modal de Historia en Bruto -->
     <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -80,14 +85,6 @@
       </div>
     </div>
 
-    <hr>
-
-    <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
-    <h4>Procesar Detalle de Atención en Bruto</h4>
-    <button type="button" class="btn btn-secondary mb-3" data-toggle="modal" data-target="#detalleBrutoModal">
-        Ingresar Detalle de Atención en Bruto
-    </button>
-
     <!-- Modal de Detalle de Atención en Bruto -->
     <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -117,6 +114,7 @@
         </div>
       </div>
     </div>
+
 </div>
 {% endblock %}
 
