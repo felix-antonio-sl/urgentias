@@ -9,7 +9,7 @@ from ..forms import (
     ProcesarHistoriaBrutoForm,
     ProcesarDetalleBrutoForm
 )
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 main = Blueprint('main', __name__)
 
@@ -44,8 +44,8 @@ def detalle_atencion(atencion_id):
 
     form_historia = ActualizarHistoriaForm(prefix='historia')
     form_detalle = ActualizarDetalleForm(prefix='detalle')
-    form_procesar_historia = ProcesarHistoriaBrutoForm(prefix='procesar_historia')
-    form_procesar_detalle = ProcesarDetalleBrutoForm(prefix='procesar_detalle')
+    form_procesar_historia = ProcesarHistoriaBrutoForm(prefix='procesar_historia_modal')
+    form_procesar_detalle = ProcesarDetalleBrutoForm(prefix='procesar_detalle_modal')
 
     if form_historia.validate_on_submit() and form_historia.submit.data:
         paciente.historia = form_historia.historia.data
@@ -86,6 +86,51 @@ def detalle_atencion(atencion_id):
         form_procesar_historia=form_procesar_historia,
         form_procesar_detalle=form_procesar_detalle
     )
+
+# Nuevas rutas para manejar el procesamiento desde los modales
+
+@main.route('/procesar_historia_bruto_modal/<string:atencion_id>', methods=['POST'])
+@login_required
+def procesar_historia_bruto_modal(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    paciente = atencion.paciente
+
+    # Añade el prefijo al instanciar el formulario
+    form_procesar_historia = ProcesarHistoriaBrutoForm(prefix='procesar_historia_modal')
+    if form_procesar_historia.validate_on_submit():
+        texto_bruto = form_procesar_historia.historia_bruto.data
+        historia_actualizada = procesar_historia(paciente.historia or '', texto_bruto)
+        paciente.historia = historia_actualizada.text
+        db.session.commit()
+        flash('Historia procesada y actualizada.', 'success')
+    else:
+        for field, errors in form_procesar_historia.errors.items():
+            for error in errors:
+                flash(f'Error en {getattr(form_procesar_historia, field).label.text}: {error}', 'danger')
+
+    return redirect(url_for('main.detalle_atencion', atencion_id=atencion_id))
+
+@main.route('/procesar_detalle_bruto_modal/<string:atencion_id>', methods=['POST'])
+@login_required
+def procesar_detalle_bruto_modal(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    paciente = atencion.paciente
+
+    # Añade el prefijo al instanciar el formulario
+    form_procesar_detalle = ProcesarDetalleBrutoForm(prefix='procesar_detalle_modal')
+    if form_procesar_detalle.validate_on_submit():
+        texto_bruto = form_procesar_detalle.detalle_bruto.data
+        detalle_actualizado = procesar_detalle_atencion(
+            paciente.historia or '', atencion.detalle or '', texto_bruto)
+        atencion.detalle = detalle_actualizado.text
+        db.session.commit()
+        flash('Detalle de atención procesado y actualizado.', 'success')
+    else:
+        for field, errors in form_procesar_detalle.errors.items():
+            for error in errors:
+                flash(f'Error en {getattr(form_procesar_detalle, field).label.text}: {error}', 'danger')
+
+    return redirect(url_for('main.detalle_atencion', atencion_id=atencion_id))
 
 def register_error_handlers(app):
     from flask import render_template
