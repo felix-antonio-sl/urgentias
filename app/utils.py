@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-@ell.complex(model="GPT-4o")
+@ell.complex(model="gpt-4o")
 def procesar_historia(historia_actual: str, texto_bruto: str) -> str:
     return f"""
 Historia actual:
@@ -16,7 +16,7 @@ Nuevo texto en bruto:
 Por favor, genera una historia clínica actualizada y coherente.
 """
 
-@ell.complex(model="GPT-4o")
+@ell.complex(model="gpt-4o")
 def procesar_detalle_atencion(historia_paciente: str, detalle_actual: str, texto_bruto: str) -> str:
     return f"""
 Usted es un especialista en medicina de urgencias y emergencias y en documentación clínica. Su tarea es elaborar un registro en tiempo real del proceso de atención de un paciente en un servicio de urgencias, basándose en la información proporcionada y siguiendo los principios de documentación en medicina de emergencia.
