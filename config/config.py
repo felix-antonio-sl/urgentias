@@ -10,7 +10,6 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
     ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
-    SENTRY_DSN = os.getenv('SENTRY_DSN')
 
 class DevelopmentConfig(Config):
     DEBUG = True

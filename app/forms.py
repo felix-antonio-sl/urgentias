@@ -37,3 +37,6 @@ class RegisterForm(FlaskForm):
 class ProcesarTextoNoEstructuradoForm(FlaskForm):
     texto = TextAreaField('Texto no estructurado', validators=[DataRequired()])
     submit = SubmitField('Procesar Atención')
+
+class CerrarAtencionForm(FlaskForm):
+    submit = SubmitField('Cerrar')

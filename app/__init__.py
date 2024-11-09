@@ -25,6 +25,9 @@ def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    # Configuración para aceptar tokens CSRF en los encabezados
+    app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken']
+
     ell.init(store='./logdir', verbose=True, autocommit=True)
 
     db.init_app(app)

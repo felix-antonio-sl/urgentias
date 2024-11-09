@@ -8,7 +8,8 @@ from ..forms import (
     ActualizarDetalleForm,
     ProcesarHistoriaBrutoForm,
     ProcesarDetalleBrutoForm,
-    ProcesarTextoNoEstructuradoForm
+    ProcesarTextoNoEstructuradoForm,
+    CerrarAtencionForm  # Nueva importación
 )
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -26,7 +27,8 @@ def obtener_sintesis(detalle, longitud=150):
 @login_required
 def lista_atenciones():
     atenciones = Atencion.query.filter_by(activa=True).order_by(Atencion.creado_en.desc()).all()
-    return render_template('atenciones.html', atenciones=atenciones)
+    form_cerrar = CerrarAtencionForm()
+    return render_template('atenciones.html', atenciones=atenciones, form_cerrar=form_cerrar)
 
 
 @main.route('/crear_atencion', methods=['GET', 'POST'])
@@ -92,7 +94,8 @@ def procesar_historia_bruto_modal(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
-    form_procesar_historia = ProcesarHistoriaBrutoForm()
+    # Añadir el prefijo al formulario
+    form_procesar_historia = ProcesarHistoriaBrutoForm(prefix='procesar_historia_modal')
     if form_procesar_historia.validate_on_submit():
         texto_bruto = form_procesar_historia.historia_bruto.data
         historia_actualizada = procesar_historia(paciente.historia or '', texto_bruto)
@@ -100,6 +103,8 @@ def procesar_historia_bruto_modal(atencion_id):
         db.session.commit()
         flash('Historia procesada y actualizada.', 'success')
     else:
+        # Agregar registro de errores para depuración
+        current_app.logger.error(f"Errores del formulario: {form_procesar_historia.errors}")
         flash('Error al procesar la historia.', 'error')
 
     return redirect(url_for('main.detalle_atencion', atencion_id=atencion_id))
@@ -110,7 +115,8 @@ def procesar_detalle_bruto_modal(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
-    form_procesar_detalle = ProcesarDetalleBrutoForm()
+    # Añadir el prefijo al formulario
+    form_procesar_detalle = ProcesarDetalleBrutoForm(prefix='procesar_detalle_modal')
     if form_procesar_detalle.validate_on_submit():
         texto_bruto = form_procesar_detalle.detalle_bruto.data
         detalle_actualizado = procesar_detalle_atencion(
@@ -119,6 +125,8 @@ def procesar_detalle_bruto_modal(atencion_id):
         db.session.commit()
         flash('Detalle de atención procesado y actualizado.', 'success')
     else:
+        # Agregar registro de errores para depuración
+        current_app.logger.error(f"Errores del formulario: {form_procesar_detalle.errors}")
         flash('Error al procesar el detalle de atención.', 'error')
 
     return redirect(url_for('main.detalle_atencion', atencion_id=atencion_id))
@@ -197,11 +205,15 @@ def generar_reporte(atencion_id):
 @main.route('/cerrar_atencion/<string:atencion_id>', methods=['POST'])
 @login_required
 def cerrar_atencion(atencion_id):
-    atencion = Atencion.query.get_or_404(atencion_id)
-    atencion.activa = False
-    atencion.cerrada_en = datetime.utcnow()
-    db.session.commit()
-    flash('Atención cerrada exitosamente.', 'success')
+    form = CerrarAtencionForm()
+    if form.validate_on_submit():
+        atencion = Atencion.query.get_or_404(atencion_id)
+        atencion.activa = False
+        atencion.cerrada_en = datetime.utcnow()
+        db.session.commit()
+        flash('Atención cerrada exitosamente.', 'success')
+    else:
+        flash('Error al cerrar la atención.', 'error')
     return redirect(url_for('main.lista_atenciones'))
 
 def register_error_handlers(app):
