@@ -8,8 +8,8 @@ from ..forms import (
     ActualizarDetalleForm,
     ProcesarHistoriaBrutoForm,
     ProcesarDetalleBrutoForm,
-    ProcesarTextoNoEstructuradoForm,
-    CerrarAtencionForm  # Nueva importación
+    ProcesarTextoNoEstructuradoForm,  # Asegúrate de importar el formulario
+    CerrarAtencionForm
 )
 from flask_login import login_required, current_user
 from datetime import datetime
@@ -19,7 +19,7 @@ from io import BytesIO
 
 main = Blueprint('main', __name__)
 
-def obtener_sintesis(detalle, longitud=150):
+def obtener_sintesis(detalle, longitud=25):
     """Obtiene una síntesis breve del detalle de la atención."""
     return detalle[:longitud] + "..." if detalle and len(detalle) > longitud else detalle or "Sin detalle"
 
@@ -28,7 +28,14 @@ def obtener_sintesis(detalle, longitud=150):
 def lista_atenciones():
     atenciones = Atencion.query.filter_by(activa=True).order_by(Atencion.creado_en.desc()).all()
     form_cerrar = CerrarAtencionForm()
-    return render_template('atenciones.html', atenciones=atenciones, form_cerrar=form_cerrar)
+    form_procesar_texto = ProcesarTextoNoEstructuradoForm()
+    return render_template(
+        'atenciones.html',
+        atenciones=atenciones,
+        form_cerrar=form_cerrar,
+        form_procesar_texto=form_procesar_texto  # Pasa el formulario al template
+    )
+
 
 
 @main.route('/crear_atencion', methods=['GET', 'POST'])
