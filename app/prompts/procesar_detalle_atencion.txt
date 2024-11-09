@@ -30,5 +30,3 @@ Basándose en estos principios y en la información proporcionada, genere un reg
 5. Documentar cualquier cambio significativo en el estado del paciente.
 6. Usa abreviaciones médicas reconocidas y universales
 7. Evita justificaciones, interpretaciones y recomendaciones
-
-Presente su registro incremental dentro de etiquetas <registro_atencion>.

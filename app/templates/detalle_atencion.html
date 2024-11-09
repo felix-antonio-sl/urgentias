@@ -5,14 +5,25 @@
 
 {% block content %}
 <div class="container mt-4">
-  <h2 class="mb-4">Detalle de Atención</h2>
+  <h2 class="mb-4">Atención Actual</h2>
 
-  <h3>Paciente: {{ paciente.run }}</h3>
+  <div class="row mb-3">
+    <div class="col-md-4"><strong>RUT:</strong> {{ paciente.run }}</div>
+    <div class="col-md-4"><strong>Nombre:</strong> {{ paciente.nombre or 'N/A' }}</div>
+    <div class="col-md-4"><strong>Edad:</strong> 
+        {% if paciente.edad %}
+            {{ paciente.edad }} años
+        {% else %}
+            N/A
+        {% endif %}
+    </div>
+  </div>
+
 
   <div class="row">
     <!-- Columna de Actualizar Historia Clínica -->
     <div class="col-md-6">
-      <h4>Actualizar Historia Clínica</h4>
+      <h4>Historia Clínica</h4>
       <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
         {{ form_historia.hidden_tag() }}
         {{ macros.render_form_field(form_historia.historia, attrs={'rows': 10, 'id': 'historiaClinica'}) }}
@@ -28,7 +39,7 @@
 
     <!-- Columna de Actualizar Detalle de Atención Actual -->
     <div class="col-md-6">
-      <h4>Actualizar Detalle de Atención Actual</h4>
+      <h4>Atención Actual</h4>
       <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
         {{ form_detalle.hidden_tag() }}
         {{ macros.render_form_field(form_detalle.detalle, attrs={'rows': 10, 'id': 'detalleAtencion'}) }}
