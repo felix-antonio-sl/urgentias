@@ -15,13 +15,17 @@ from ..utils import (
     procesar_historia,
     procesar_detalle_atencion,
     procesar_texto_no_estructurado,
+    generar_diagnostico_diferencial,
+    generar_manejo_sugerido,
+    generar_proxima_accion,
+    generar_alertas,
 )
 from ..forms import (
     ActualizarHistoriaForm,
     ActualizarDetalleForm,
     ProcesarHistoriaBrutoForm,
     ProcesarDetalleBrutoForm,
-    ProcesarTextoNoEstructuradoForm,  # Asegúrate de importar el formulario
+    ProcesarTextoNoEstructuradoForm,
     CerrarAtencionForm,
 )
 from flask_login import login_required, current_user
@@ -29,8 +33,13 @@ from datetime import datetime
 import json
 import re
 from io import BytesIO
+import logging
+from datetime import datetime, timezone  # Importar timezone
 
 main = Blueprint("main", __name__)
+
+# Configuración de logging
+logger = logging.getLogger(__name__)
 
 
 def obtener_sintesis(detalle, longitud=25):
@@ -54,7 +63,7 @@ def lista_atenciones():
         "atenciones.html",
         atenciones=atenciones,
         form_cerrar=form_cerrar,
-        form_procesar_texto=form_procesar_texto,  # Pasa el formulario al template
+        form_procesar_texto=form_procesar_texto,
     )
 
 
@@ -72,12 +81,31 @@ def detalle_atencion(atencion_id):
     if form_historia.validate_on_submit() and form_historia.submit.data:
         paciente.historia = form_historia.historia.data
         db.session.commit()
-        flash("Historia actualizada correctamente.", "success")
+        try:
+            actualizar_informacion_ai(atencion)
+            flash("Historia y datos AI actualizados correctamente.", "success")
+        except Exception as e:
+            logger.error(f"Error al actualizar información AI: {e}")
+            flash(
+                "Historia actualizada. La información AI no está disponible temporalmente.",
+                "warning",
+            )
         return redirect(url_for("main.detalle_atencion", atencion_id=atencion_id))
+
     elif form_detalle.validate_on_submit() and form_detalle.submit.data:
         atencion.detalle = form_detalle.detalle.data
         db.session.commit()
-        flash("Detalle de atención actualizado correctamente.", "success")
+        try:
+            actualizar_informacion_ai(atencion)
+            flash(
+                "Detalle de atención y datos AI actualizados correctamente.", "success"
+            )
+        except Exception as e:
+            logger.error(f"Error al actualizar información AI: {e}")
+            flash(
+                "Detalle actualizado. La información AI no está disponible temporalmente.",
+                "warning",
+            )
         return redirect(url_for("main.detalle_atencion", atencion_id=atencion_id))
 
     if request.method == "GET":
@@ -93,6 +121,44 @@ def detalle_atencion(atencion_id):
         form_procesar_historia=form_procesar_historia,
         form_procesar_detalle=form_procesar_detalle,
     )
+
+
+def actualizar_informacion_ai(atencion):
+    paciente = atencion.paciente
+
+    logger.info(f"Actualizando información AI para Atención ID: {atencion.id}")
+
+    # Generación de información AI
+    try:
+        diagnostico_msg = generar_diagnostico_diferencial(
+            paciente.historia or "", atencion.detalle or ""
+        )
+        manejo_msg = generar_manejo_sugerido(
+            paciente.historia or "", atencion.detalle or ""
+        )
+        accion_msg = generar_proxima_accion(
+            paciente.historia or "", atencion.detalle or ""
+        )
+        alertas_msg = generar_alertas(paciente.historia or "", atencion.detalle or "")
+    except Exception as e:
+        logger.error(f"Error al llamar a las funciones AI: {e}")
+        raise
+
+    # Asignación de los resultados parseados
+    try:
+        atencion.diagnostico_diferencial = "\n".join(
+            diagnostico_msg.parsed.diagnosticos
+        )
+        atencion.manejo_sugerido = manejo_msg.parsed.manejo
+        atencion.proxima_accion = accion_msg.parsed.accion
+        atencion.alertas = "\n".join(alertas_msg.parsed.alertas)
+    except AttributeError as e:
+        logger.error(f"Error al asignar los resultados AI: {e}")
+        raise
+
+    atencion.actualizado_en = datetime.now(timezone.utc)  # Actualizado
+    db.session.commit()
+    logger.info(f"Información AI actualizada para Atención ID: {atencion.id}")
 
 
 @main.route("/procesar_historia_bruto_modal/<string:atencion_id>", methods=["POST"])

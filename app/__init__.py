@@ -30,7 +30,14 @@ def create_app(config_class=DevelopmentConfig):
     # Configuración para aceptar tokens CSRF en los encabezados
     app.config["WTF_CSRF_HEADERS"] = ["X-CSRFToken"]
 
-    ell.init(store="./logdir", verbose=True, autocommit=True)
+    # Inicialización de ell
+    ell.init(
+        store="./ell_storage",
+        autocommit=True,
+        verbose=True,
+        lazy_versioning=True,
+        default_api_params={"temperature": 0.0},
+    )
 
     db.init_app(app)
     migrate.init_app(app, db)

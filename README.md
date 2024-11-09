@@ -4,7 +4,7 @@ Aplicación web para la gestión y documentación en tiempo real de atenciones e
 
 ## Estructura del Proyecto
 
-```
+```plain
 ├── app/
 │   ├── __init__.py             # Configuración inicial de la aplicación
 │   ├── forms.py                # Formularios para la interfaz web
@@ -120,7 +120,20 @@ Asegúrate de configurar las siguientes variables de entorno en el archivo `.env
 1. **Gestión de Pacientes y Atenciones:** Manejo de información clínica, edad, y RUN.
 2. **Procesamiento de Texto No Estructurado:** Extracción de datos médicos en JSON usando IA.
 3. **Documentación de Historia y Atención en Emergencia:** Procesamiento incremental de detalles de atención, con énfasis en precisión y cronología.
-4. **Autenticación de Usuarios:** Registro, inicio de sesión y seguridad CSRF.
+4. **Asistente AI Integrado:** Generación automática de diagnóstico diferencial, manejo sugerido, próxima acción más importante y alertas de riesgos, utilizando inteligencia artificial.
+5. **Autenticación de Usuarios:** Registro, inicio de sesión y seguridad CSRF.
+
+## Configuración de Claves API
+
+Asegúrate de configurar las siguientes variables de entorno en el archivo `.env`:
+
+- `OPENAI_API_KEY`: Clave para la API de OpenAI utilizada por **ell**.
+- `ANTHROPIC_API_KEY`: Clave para la API de Anthropic (si es aplicable).
+
+## Consideraciones de Seguridad y Privacidad
+
+- **Protección de Datos:** Los datos de los pacientes son sensibles. Asegúrate de que las comunicaciones con los servicios de AI cumplan con las normativas de protección de datos aplicables.
+- **Manejo de Errores:** El sistema está diseñado para manejar de manera segura las interrupciones en los servicios de AI, notificando al usuario sin exponer información sensible.
 
 ## Dependencias
 

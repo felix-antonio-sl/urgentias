@@ -2,10 +2,14 @@
 
 /* Variables de colores personalizados */
 :root {
-    --primary-color: #00B2A9; /* Teal */
-    --secondary-color: #4B0082; /* Indigo */
-    --accent-color: #FFD700; /* Gold */
-    --highlight-color: #C71585; /* Medium Violet Red */
+    --primary-color: #00B2A9;
+    /* Teal */
+    --secondary-color: #4B0082;
+    /* Indigo */
+    --accent-color: #FFD700;
+    /* Gold */
+    --highlight-color: #C71585;
+    /* Medium Violet Red */
 
     /* Sobrescribir variables de Bootstrap */
     --bs-primary: var(--primary-color);
@@ -13,4 +17,17 @@
     --bs-success: var(--accent-color);
     --bs-danger: var(--highlight-color);
     /* Puedes continuar sobrescribiendo otras variables según sea necesario */
+}
+
+/* Estilos para resaltar información AI */
+.text-highlight {
+    background-color: #ffffcc;
+    /* Amarillo claro */
+    font-weight: bold;
+}
+
+.text-danger {
+    color: var(--bs-danger);
+    /* Usando el color definido */
+    font-weight: bold;
 }

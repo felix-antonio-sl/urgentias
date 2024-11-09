@@ -10,15 +10,14 @@
   <div class="row mb-3">
     <div class="col-md-4"><strong>RUT:</strong> {{ paciente.run }}</div>
     <div class="col-md-4"><strong>Nombre:</strong> {{ paciente.nombre or 'N/A' }}</div>
-    <div class="col-md-4"><strong>Edad:</strong> 
-        {% if paciente.edad %}
-            {{ paciente.edad }} años
-        {% else %}
-            N/A
-        {% endif %}
+    <div class="col-md-4"><strong>Edad:</strong>
+      {% if paciente.edad %}
+      {{ paciente.edad }} años
+      {% else %}
+      N/A
+      {% endif %}
     </div>
   </div>
-
 
   <div class="row">
     <!-- Columna de Actualizar Historia Clínica -->
@@ -51,6 +50,28 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Secciones de Información Generada por AI -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <h4>Diagnóstico Diferencial</h4>
+      <p>{{ atencion.diagnostico_diferencial or "Información no disponible" }}</p>
+    </div>
+    <div class="col-md-6">
+      <h4>Manejo Sugerido</h4>
+      <p>{{ atencion.manejo_sugerido or "Información no disponible" }}</p>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <h4>Próxima Acción Más Importante</h4>
+      <p class="text-highlight">{{ atencion.proxima_accion or "Información no disponible" }}</p>
+    </div>
+    <div class="col-md-6">
+      <h4>Alertas de Amenazas o Riesgos</h4>
+      <p class="text-danger">{{ atencion.alertas or "Información no disponible" }}</p>
     </div>
   </div>
 
