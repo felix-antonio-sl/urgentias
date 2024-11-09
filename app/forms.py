@@ -2,12 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
-
-class CrearAtencionForm(FlaskForm):
-    run = StringField("RUN del Paciente", validators=[DataRequired(), Length(max=12)])
-    submit = SubmitField("Crear Atención")
-
-
 class ActualizarHistoriaForm(FlaskForm):
     historia = TextAreaField("Historia Clínica", validators=[DataRequired()])
     submit = SubmitField("Actualizar Historia")

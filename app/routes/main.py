@@ -17,7 +17,6 @@ from ..utils import (
     procesar_texto_no_estructurado,
 )
 from ..forms import (
-    CrearAtencionForm,
     ActualizarHistoriaForm,
     ActualizarDetalleForm,
     ProcesarHistoriaBrutoForm,
@@ -57,32 +56,6 @@ def lista_atenciones():
         form_cerrar=form_cerrar,
         form_procesar_texto=form_procesar_texto,  # Pasa el formulario al template
     )
-
-
-@main.route("/crear_atencion", methods=["GET", "POST"])
-@login_required
-def crear_atencion():
-    form = CrearAtencionForm()
-    if form.validate_on_submit():
-        run = form.run.data
-        if not Paciente.validar_run(run):
-            flash("RUN inválido. Por favor, verifica el formato.", "error")
-            return redirect(url_for("main.crear_atencion"))
-
-        paciente = Paciente.query.filter_by(run=run).first()
-        if not paciente:
-            flash(
-                "Paciente no encontrado. Por favor, utiliza el modal para crear una atención con texto no estructurado.",
-                "error",
-            )
-            return redirect(url_for("main.crear_atencion"))
-        atencion = Atencion(paciente_id=paciente.id)
-        db.session.add(atencion)
-        db.session.commit()
-        flash("Atención creada exitosamente.", "success")
-        return redirect(url_for("main.lista_atenciones"))
-    return render_template("crear_atencion.html", form=form)
-
 
 @main.route("/detalle_atencion/<string:atencion_id>", methods=["GET", "POST"])
 @login_required
