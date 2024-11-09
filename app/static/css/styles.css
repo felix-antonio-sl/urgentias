@@ -2,12 +2,18 @@
 
 /* Variables de colores */
 :root {
-    --primary-color: #00B2A9;  /* Teal */
-    --secondary-color: #4B0082; /* Indigo */
-    --accent-color: #FFD700;    /* Gold */
-    --text-color: #000000;      /* Black */
-    --background-color: #FFFFFF;/* White */
-    --highlight-color: #C71585; /* Medium Violet Red */
+    --primary-color: #00B2A9;
+    /* Teal */
+    --secondary-color: #4B0082;
+    /* Indigo */
+    --accent-color: #FFD700;
+    /* Gold */
+    --text-color: #000000;
+    /* Black */
+    --background-color: #FFFFFF;
+    /* White */
+    --highlight-color: #C71585;
+    /* Medium Violet Red */
 }
 
 /* Aplicar el fondo blanco */

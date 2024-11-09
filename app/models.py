@@ -5,9 +5,10 @@ import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
+
 class Paciente(db.Model):
-    __tablename__ = 'pacientes'
-    
+    __tablename__ = "pacientes"
+
     id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
     nombre = db.Column(db.String(100), nullable=False)  # Nombre completo del paciente
     run = db.Column(db.String(12), unique=True, nullable=False)  # RUN validado
@@ -15,23 +16,30 @@ class Paciente(db.Model):
     historia = db.Column(db.Text, nullable=True)
     creado_en = db.Column(db.DateTime, default=lambda: datetime.utcnow())
 
-    atenciones = db.relationship('Atencion', backref='paciente', lazy=True)
+    atenciones = db.relationship("Atencion", backref="paciente", lazy=True)
 
     @property
     def edad(self):
         hoy = date.today()
-        return hoy.year - self.fecha_nacimiento.year - ((hoy.month, hoy.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
+        return (
+            hoy.year
+            - self.fecha_nacimiento.year
+            - (
+                (hoy.month, hoy.day)
+                < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+            )
+        )
 
     @staticmethod
     def validar_run(run):
-        return bool(re.match(r'^\d{6,8}-[\dkK]$', run))
+        return bool(re.match(r"^\d{6,8}-[\dkK]$", run))
 
 
 class Atencion(db.Model):
-    __tablename__ = 'atenciones'
-    
+    __tablename__ = "atenciones"
+
     id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    paciente_id = db.Column(db.String, db.ForeignKey('pacientes.id'), nullable=False)
+    paciente_id = db.Column(db.String, db.ForeignKey("pacientes.id"), nullable=False)
     activa = db.Column(db.Boolean, default=True)
     detalle = db.Column(db.Text, nullable=True)
     informe_final = db.Column(db.Text, nullable=True)
@@ -48,12 +56,16 @@ class Atencion(db.Model):
         return f"{int(horas):02}:{minutos:02}"
 
     def obtener_sintesis(self, longitud=150):
-        detalle = self.detalle or ''
-        return detalle[:longitud] + "..." if len(detalle) > longitud else detalle or "Sin detalle"
+        detalle = self.detalle or ""
+        return (
+            detalle[:longitud] + "..."
+            if len(detalle) > longitud
+            else detalle or "Sin detalle"
+        )
 
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)

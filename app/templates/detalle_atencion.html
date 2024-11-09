@@ -19,7 +19,8 @@
                 <div class="d-flex">
                     {{ form_historia.submit(class="btn btn-primary me-2") }}
                     <!-- Botón para abrir el modal de Historia en Bruto -->
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                        data-bs-target="#historiaBrutoModal">
                         Procesar
                     </button>
                 </div>
@@ -35,7 +36,8 @@
                 <div class="d-flex">
                     {{ form_detalle.submit(class="btn btn-primary me-2") }}
                     <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                        data-bs-target="#detalleBrutoModal">
                         Procesar
                     </button>
                 </div>
@@ -45,17 +47,20 @@
 
     <!-- Modales -->
     <!-- Modal de Historia en Bruto -->
-    <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="POST" action="{{ url_for('main.procesar_historia_bruto_modal', atencion_id=atencion.id) }}">
+                <form method="POST"
+                    action="{{ url_for('main.procesar_historia_bruto_modal', atencion_id=atencion.id) }}">
                     {{ form_procesar_historia.hidden_tag() }}
                     <div class="modal-header">
                         <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Historia en Bruto</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
-                        {{ macros.render_form_field(form_procesar_historia.historia_bruto, attrs={'id': 'historiaBruto', 'rows': 5}) }}
+                        {{ macros.render_form_field(form_procesar_historia.historia_bruto, attrs={'id': 'historiaBruto',
+                        'rows': 5}) }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -67,17 +72,20 @@
     </div>
 
     <!-- Modal de Detalle de Atención en Bruto -->
-    <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="POST" action="{{ url_for('main.procesar_detalle_bruto_modal', atencion_id=atencion.id) }}">
+                <form method="POST"
+                    action="{{ url_for('main.procesar_detalle_bruto_modal', atencion_id=atencion.id) }}">
                     {{ form_procesar_detalle.hidden_tag() }}
                     <div class="modal-header">
                         <h5 class="modal-title" id="detalleBrutoModalLabel">Procesar Detalle de Atención en Bruto</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
-                        {{ macros.render_form_field(form_procesar_detalle.detalle_bruto, attrs={'id': 'detalleBruto', 'rows': 5}) }}
+                        {{ macros.render_form_field(form_procesar_detalle.detalle_bruto, attrs={'id': 'detalleBruto',
+                        'rows': 5}) }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

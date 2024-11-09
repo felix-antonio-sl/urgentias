@@ -20,7 +20,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    {{ macros.render_form_field(form_procesar_texto.texto, attrs={'id': 'textoNoEstructurado', 'rows': 5, 'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'}) }}
+                    {{ macros.render_form_field(form_procesar_texto.texto, attrs={'id': 'textoNoEstructurado', 'rows':
+                    5, 'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'}) }}
                     <div id="crearAtencionError" class="text-danger mt-2" style="display: none;"></div>
                 </div>
                 <div class="modal-footer">
@@ -63,7 +64,8 @@
                 <form action="{{ url_for('main.cerrar_atencion', atencion_id=atencion.id) }}" method="POST"
                     style="display:inline;">
                     {{ form_cerrar.hidden_tag() }}
-                    {{ form_cerrar.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de cerrar esta atención?');") }}
+                    {{ form_cerrar.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de cerrar
+                    esta atención?');") }}
                 </form>
             </td>
         </tr>
