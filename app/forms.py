@@ -33,3 +33,7 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Contraseña', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirmar Contraseña', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Registrarse')
+
+class ProcesarTextoNoEstructuradoForm(FlaskForm):
+    texto = TextAreaField('Texto no estructurado', validators=[DataRequired()])
+    submit = SubmitField('Procesar Atención')

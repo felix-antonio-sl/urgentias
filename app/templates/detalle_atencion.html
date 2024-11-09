@@ -116,23 +116,11 @@
 
 {% block scripts %}
 <script>
-    // Como estamos usando Bootstrap 5, necesitamos ajustar el código JavaScript
-    document.addEventListener('DOMContentLoaded', function() {
-        // Indicador de carga para el modal de Historia en Bruto
-        const historiaBrutoForm = document.querySelector('#historiaBrutoModal form');
-        historiaBrutoForm.addEventListener('submit', function() {
-            const modal = bootstrap.Modal.getInstance(document.querySelector('#historiaBrutoModal'));
-            modal._element.querySelectorAll('button').forEach(button => button.disabled = true);
-            modal._element.querySelector('.modal-footer .btn-primary').textContent = 'Procesando...';
-        });
-
-        // Indicador de carga para el modal de Detalle de Atención en Bruto
-        const detalleBrutoForm = document.querySelector('#detalleBrutoModal form');
-        detalleBrutoForm.addEventListener('submit', function() {
-            const modal = bootstrap.Modal.getInstance(document.querySelector('#detalleBrutoModal'));
-            modal._element.querySelectorAll('button').forEach(button => button.disabled = true);
-            modal._element.querySelector('.modal-footer .btn-primary').textContent = 'Procesando...';
-        });
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+});
 </script>
 {% endblock %}

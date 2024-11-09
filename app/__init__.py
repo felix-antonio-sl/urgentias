@@ -6,11 +6,14 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import ell
+from flask_wtf import CSRFProtect
 from flask_login import LoginManager
+
 
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
+csrf = CSRFProtect()
 
 from .models import User, Paciente, Atencion
 
@@ -29,6 +32,7 @@ def create_app(config_class=DevelopmentConfig):
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.login_message_category = 'info'
+    csrf.init_app(app)
 
     from .routes.main import main as main_bp
     app.register_blueprint(main_bp)

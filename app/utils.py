@@ -1,10 +1,11 @@
 import ell
 import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
-@ell.complex(model="gpt-4o")
+@ell.complex(model="gpt-4o-mini")
 def procesar_historia(historia_actual: str, texto_bruto: str) -> str:
     return f"""
 Historia actual:
@@ -16,7 +17,7 @@ Nuevo texto en bruto:
 Por favor, genera una historia clínica actualizada y coherente.
 """
 
-@ell.complex(model="gpt-4o")
+@ell.complex(model="gpt-4o-mini")
 def procesar_detalle_atencion(historia_paciente: str, detalle_actual: str, texto_bruto: str) -> str:
     return f"""
 Usted es un especialista en medicina de urgencias y emergencias y en documentación clínica. Su tarea es elaborar un registro en tiempo real del proceso de atención de un paciente en un servicio de urgencias, basándose en la información proporcionada y siguiendo los principios de documentación en medicina de emergencia.
@@ -53,4 +54,20 @@ Basándose en estos principios y en la información proporcionada, genere un reg
 7. Evita justificaciones, interpretaciones y recomendaciones
 
 Presente su registro incremental dentro de etiquetas <registro_atencion>.
+"""
+
+@ell.complex(model="gpt-4o-mini")
+def procesar_texto_no_estructurado(texto_bruto: str):
+    return f"""
+Usted es un asistente que extrae información médica de texto no estructurado.
+
+Por favor, extraiga y devuelva los siguientes datos en formato JSON:
+- run: RUN del paciente (formato '12345678-9').
+- nombre: Nombre completo del paciente.
+- fecha_nacimiento: Fecha de nacimiento en formato dd/mm/aaaa.
+
+Si algún dato no está presente, coloque 'N/A' en su lugar.
+
+Texto:
+{texto_bruto}
 """
