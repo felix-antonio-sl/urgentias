@@ -45,7 +45,8 @@
 
   <!-- Modales -->
   <!-- Modal de Historia en Bruto -->
-  <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel" aria-hidden="true">
+  <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <form method="POST" action="{{ url_for('main.procesar_historia_bruto_modal', atencion_id=atencion.id) }}">
@@ -55,7 +56,8 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
-            {{ macros.render_form_field(form_procesar_historia.historia_bruto, attrs={'id': 'historiaBruto', 'rows': 5}) }}
+            {{ macros.render_form_field(form_procesar_historia.historia_bruto, attrs={'id': 'historiaBruto', 'rows': 5})
+            }}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -67,7 +69,8 @@
   </div>
 
   <!-- Modal de Detalle de Atención en Bruto -->
-  <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel" aria-hidden="true">
+  <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <form method="POST" action="{{ url_for('main.procesar_detalle_bruto_modal', atencion_id=atencion.id) }}">
@@ -94,39 +97,39 @@
 
 {% block scripts %}
 <script>
-    // Manejar el envío del formulario de Texto No Estructurado
-    document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
-        const texto = document.getElementById("textoNoEstructurado").value.trim();
-        const errorDiv = document.getElementById("crearAtencionError");
-        errorDiv.style.display = "none";
-        errorDiv.textContent = "";
+  // Manejar el envío del formulario de Texto No Estructurado
+  document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
+    const texto = document.getElementById("textoNoEstructurado").value.trim();
+    const errorDiv = document.getElementById("crearAtencionError");
+    errorDiv.style.display = "none";
+    errorDiv.textContent = "";
 
-        if (!texto) {
-            errorDiv.textContent = "El texto no puede estar vacío.";
-            errorDiv.style.display = "block";
-            return;
+    if (!texto) {
+      errorDiv.textContent = "El texto no puede estar vacío.";
+      errorDiv.style.display = "block";
+      return;
+    }
+
+    fetch("{{ url_for('main.procesar_texto') }}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token() }}"
+      },
+      body: JSON.stringify({ texto })
+    }).then(response => response.json().then(data => ({ status: response.status, body: data })))
+      .then(result => {
+        if (result.status === 200) {
+          window.location.reload();
+        } else {
+          errorDiv.textContent = result.body.error || "Error al procesar el texto.";
+          errorDiv.style.display = "block";
         }
-
-        fetch("{{ url_for('main.procesar_texto') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ texto })
-        }).then(response => response.json().then(data => ({ status: response.status, body: data })))
-            .then(result => {
-                if (result.status === 200) {
-                    window.location.reload();
-                } else {
-                    errorDiv.textContent = result.body.error || "Error al procesar el texto.";
-                    errorDiv.style.display = "block";
-                }
-            })
-            .catch(() => {
-                errorDiv.textContent = "Error de comunicación con el servidor.";
-                errorDiv.style.display = "block";
-            });
-    });
+      })
+      .catch(() => {
+        errorDiv.textContent = "Error de comunicación con el servidor.";
+        errorDiv.style.display = "block";
+      });
+  });
 </script>
 {% endblock %}

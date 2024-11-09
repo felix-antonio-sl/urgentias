@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
+
 class ActualizarHistoriaForm(FlaskForm):
     historia = TextAreaField("Historia Clínica", validators=[DataRequired()])
     submit = SubmitField("Actualizar Historia")

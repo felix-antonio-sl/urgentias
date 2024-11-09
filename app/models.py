@@ -38,7 +38,6 @@ class Paciente(db.Model):
         return bool(re.match(r"^\d{6,8}-[\dkK]$", run))
 
 
-
 class Atencion(db.Model):
     __tablename__ = "atenciones"
 

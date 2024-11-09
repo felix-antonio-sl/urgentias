@@ -57,6 +57,7 @@ def lista_atenciones():
         form_procesar_texto=form_procesar_texto,  # Pasa el formulario al template
     )
 
+
 @main.route("/detalle_atencion/<string:atencion_id>", methods=["GET", "POST"])
 @login_required
 def detalle_atencion(atencion_id):

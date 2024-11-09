@@ -6,11 +6,12 @@
 
 <!-- Botón para abrir el modal de creación de atención con texto no estructurado -->
 <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearAtencionModal">
-    Crear Atención con Texto No Estructurado
+  Crear Atención con Texto No Estructurado
 </button>
 
 <!-- Modal para Ingreso de Texto No Estructurado -->
-<div class="modal fade" id="crearAtencionModal" tabindex="-1" aria-labelledby="crearAtencionModalLabel" aria-hidden="true">
+<div class="modal fade" id="crearAtencionModal" tabindex="-1" aria-labelledby="crearAtencionModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <form id="crearAtencionForm">
@@ -19,7 +20,8 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          {{ macros.render_form_field(form_procesar_texto.texto, attrs={'id': 'textoNoEstructurado', 'rows': 5, 'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'}) }}
+          {{ macros.render_form_field(form_procesar_texto.texto, attrs={'id': 'textoNoEstructurado', 'rows': 5,
+          'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'}) }}
           <div id="crearAtencionError" class="text-danger mt-2 d-none"></div>
         </div>
         <div class="modal-footer">
@@ -50,22 +52,26 @@
       <td>{{ atencion.paciente.nombre or 'N/A' }}</td>
       <td>
         {% if atencion.paciente.edad %}
-          {{ atencion.paciente.edad }} años
+        {{ atencion.paciente.edad }} años
         {% else %}
-          N/A
+        N/A
         {% endif %}
       </td>
       <td>
         <span data-bs-toggle="tooltip" title="{{ atencion.detalle }}">
-          {{ atencion.obtener_sintesis() }}
+          {{ atencion.obtener_sintesis(40) }}
         </span>
       </td>
       <td>
-        <a href="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}" class="btn btn-info btn-sm">Detalles</a>
-        <a href="{{ url_for('main.generar_reporte', atencion_id=atencion.id) }}" class="btn btn-secondary btn-sm">Reporte</a>
-        <form action="{{ url_for('main.cerrar_atencion', atencion_id=atencion.id) }}" method="POST" style="display:inline;">
+        <a href="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}"
+          class="btn btn-info btn-sm">Detalles</a>
+        <a href="{{ url_for('main.generar_reporte', atencion_id=atencion.id) }}"
+          class="btn btn-secondary btn-sm">Reporte</a>
+        <form action="{{ url_for('main.cerrar_atencion', atencion_id=atencion.id) }}" method="POST"
+          style="display:inline;">
           {{ form_cerrar.hidden_tag() }}
-          {{ form_cerrar.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de cerrar esta atención?');") }}
+          {{ form_cerrar.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de cerrar esta
+          atención?');") }}
         </form>
       </td>
     </tr>
