@@ -47,8 +47,14 @@
     <tr>
       <td>{{ atencion.tiempo_desde_creacion }}</td>
       <td>{{ atencion.paciente.run }}</td>
-      <td>{{ atencion.paciente.nombre }}</td>
-      <td>{{ atencion.paciente.edad }} años</td>
+      <td>{{ atencion.paciente.nombre or 'N/A' }}</td>
+      <td>
+        {% if atencion.paciente.edad %}
+          {{ atencion.paciente.edad }} años
+        {% else %}
+          N/A
+        {% endif %}
+      </td>
       <td>
         <span data-bs-toggle="tooltip" title="{{ atencion.detalle }}">
           {{ atencion.obtener_sintesis() }}

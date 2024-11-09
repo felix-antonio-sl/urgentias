@@ -10,9 +10,9 @@ class Paciente(db.Model):
     __tablename__ = "pacientes"
 
     id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    nombre = db.Column(db.String(100), nullable=False)  # Nombre completo del paciente
-    run = db.Column(db.String(12), unique=True, nullable=False)  # RUN validado
-    fecha_nacimiento = db.Column(db.Date, nullable=False)  # Fecha de nacimiento
+    nombre = db.Column(db.String(100), nullable=True)  # Cambiado a nullable=True
+    run = db.Column(db.String(12), unique=True, nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=True)  # Cambiado a nullable=True
     historia = db.Column(db.Text, nullable=True)
     creado_en = db.Column(db.DateTime, default=lambda: datetime.utcnow())
 
@@ -20,19 +20,23 @@ class Paciente(db.Model):
 
     @property
     def edad(self):
-        hoy = date.today()
-        return (
-            hoy.year
-            - self.fecha_nacimiento.year
-            - (
-                (hoy.month, hoy.day)
-                < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+        if self.fecha_nacimiento:
+            hoy = date.today()
+            return (
+                hoy.year
+                - self.fecha_nacimiento.year
+                - (
+                    (hoy.month, hoy.day)
+                    < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+                )
             )
-        )
+        else:
+            return None  # Retorna None si no hay fecha de nacimiento
 
     @staticmethod
     def validar_run(run):
         return bool(re.match(r"^\d{6,8}-[\dkK]$", run))
+
 
 
 class Atencion(db.Model):

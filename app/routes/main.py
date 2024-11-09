@@ -188,15 +188,6 @@ def procesar_texto():
 
     paciente = Paciente.query.filter_by(run=run).first()
     if not paciente:
-        if not nombre or not fecha_nacimiento:
-            return (
-                jsonify(
-                    {
-                        "error": "Falta nombre o fecha de nacimiento para crear un nuevo paciente."
-                    }
-                ),
-                400,
-            )
         paciente = Paciente(run=run, nombre=nombre, fecha_nacimiento=fecha_nacimiento)
         db.session.add(paciente)
         db.session.commit()
