@@ -1,138 +1,146 @@
 {% extends "base.html" %}
+{% import 'macros.html' as macros %}
 
 {% block title %}Detalle de Atención{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Detalle de Atención</h2>
+  <h2 class="mb-4">Atención Actual</h2>
 
-    <h3>Paciente: {{ paciente.run }}</h3>
+  <div class="row mb-3">
+    <div class="col-md-4"><strong>RUT:</strong> {{ paciente.run }}</div>
+    <div class="col-md-4"><strong>Nombre:</strong> {{ paciente.nombre or 'N/A' }}</div>
+    <div class="col-md-4"><strong>Edad:</strong> 
+        {% if paciente.edad %}
+            {{ paciente.edad }} años
+        {% else %}
+            N/A
+        {% endif %}
+    </div>
+  </div>
 
-    <div class="row">
-        <!-- Columna de Actualizar Historia Clínica -->
-        <div class="col-md-6">
-            <h4>Actualizar Historia Clínica</h4>
-            <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
-                {{ form_historia.hidden_tag() }}
-                <div class="mb-3">
-                    {{ form_historia.historia.label(class="form-label") }}
-                    {{ form_historia.historia(class="form-control", rows=10) }}
-                    {% for error in form_historia.historia.errors %}
-                        <div class="text-danger">[{{ error }}]</div>
-                    {% endfor %}
-                </div>
-                <div class="d-flex">
-                    {{ form_historia.submit(class="btn btn-primary me-2") }}
-                    <!-- Botón para abrir el modal de Historia en Bruto -->
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
-                        Procesar
-                    </button>
-                </div>
-            </form>
+
+  <div class="row">
+    <!-- Columna de Actualizar Historia Clínica -->
+    <div class="col-md-6">
+      <h4>Historia Clínica</h4>
+      <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+        {{ form_historia.hidden_tag() }}
+        {{ macros.render_form_field(form_historia.historia, attrs={'rows': 10, 'id': 'historiaClinica'}) }}
+        <div class="d-flex">
+          {{ form_historia.submit(class="btn btn-primary me-2") }}
+          <!-- Botón para abrir el modal de Historia en Bruto -->
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
+            Procesar
+          </button>
         </div>
-
-        <!-- Columna de Actualizar Detalle de Atención Actual -->
-        <div class="col-md-6">
-            <h4>Actualizar Detalle de Atención Actual</h4>
-            <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
-                {{ form_detalle.hidden_tag() }}
-                <div class="mb-3">
-                    {{ form_detalle.detalle.label(class="form-label") }}
-                    {{ form_detalle.detalle(class="form-control", rows=10) }}
-                    {% for error in form_detalle.detalle.errors %}
-                        <div class="text-danger">[{{ error }}]</div>
-                    {% endfor %}
-                </div>
-                <div class="d-flex">
-                    {{ form_detalle.submit(class="btn btn-primary me-2") }}
-                    <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
-                        Procesar
-                    </button>
-                </div>
-            </form>
-        </div>
+      </form>
     </div>
 
-    <!-- Modales -->
-    <!-- Modal de Historia en Bruto -->
-    <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form method="POST" action="{{ url_for('main.procesar_historia_bruto_modal', atencion_id=atencion.id) }}">
-            {{ form_procesar_historia.hidden_tag() }}
-            <div class="modal-header">
-              <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Historia en Bruto</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-              <div class="mb-3">
-                {{ form_procesar_historia.historia_bruto.label(class="form-label") }}
-                {{ form_procesar_historia.historia_bruto(class="form-control", rows=5) }}
-                {% for error in form_procesar_historia.historia_bruto.errors %}
-                    <div class="text-danger">[{{ error }}]</div>
-                {% endfor %}
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              {{ form_procesar_historia.submit(class="btn btn-primary") }}
-            </div>
-          </form>
+    <!-- Columna de Actualizar Detalle de Atención Actual -->
+    <div class="col-md-6">
+      <h4>Atención Actual</h4>
+      <form method="POST" action="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}">
+        {{ form_detalle.hidden_tag() }}
+        {{ macros.render_form_field(form_detalle.detalle, attrs={'rows': 10, 'id': 'detalleAtencion'}) }}
+        <div class="d-flex">
+          {{ form_detalle.submit(class="btn btn-primary me-2") }}
+          <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
+            Procesar
+          </button>
         </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modales -->
+  <!-- Modal de Historia en Bruto -->
+  <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="POST" action="{{ url_for('main.procesar_historia_bruto_modal', atencion_id=atencion.id) }}">
+          {{ form_procesar_historia.hidden_tag() }}
+          <div class="modal-header">
+            <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Historia en Bruto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            {{ macros.render_form_field(form_procesar_historia.historia_bruto, attrs={'id': 'historiaBruto', 'rows': 5})
+            }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            {{ form_procesar_historia.submit(class="btn btn-primary") }}
+          </div>
+        </form>
       </div>
     </div>
+  </div>
 
-    <!-- Modal de Detalle de Atención en Bruto -->
-    <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form method="POST" action="{{ url_for('main.procesar_detalle_bruto_modal', atencion_id=atencion.id) }}">
-            {{ form_procesar_detalle.hidden_tag() }}
-            <div class="modal-header">
-              <h5 class="modal-title" id="detalleBrutoModalLabel">Procesar Detalle de Atención en Bruto</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-              <div class="mb-3">
-                {{ form_procesar_detalle.detalle_bruto.label(class="form-label") }}
-                {{ form_procesar_detalle.detalle_bruto(class="form-control", rows=5) }}
-                {% for error in form_procesar_detalle.detalle_bruto.errors %}
-                    <div class="text-danger">[{{ error }}]</div>
-                {% endfor %}
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              {{ form_procesar_detalle.submit(class="btn btn-primary") }}
-            </div>
-          </form>
-        </div>
+  <!-- Modal de Detalle de Atención en Bruto -->
+  <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="POST" action="{{ url_for('main.procesar_detalle_bruto_modal', atencion_id=atencion.id) }}">
+          {{ form_procesar_detalle.hidden_tag() }}
+          <div class="modal-header">
+            <h5 class="modal-title" id="detalleBrutoModalLabel">Procesar Detalle de Atención en Bruto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            {{ macros.render_form_field(form_procesar_detalle.detalle_bruto, attrs={'id': 'detalleBruto', 'rows': 5}) }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            {{ form_procesar_detalle.submit(class="btn btn-primary") }}
+          </div>
+        </form>
       </div>
     </div>
+  </div>
 
 </div>
 {% endblock %}
 
+
 {% block scripts %}
 <script>
-    // Como estamos usando Bootstrap 5, necesitamos ajustar el código JavaScript
-    document.addEventListener('DOMContentLoaded', function() {
-        // Indicador de carga para el modal de Historia en Bruto
-        const historiaBrutoForm = document.querySelector('#historiaBrutoModal form');
-        historiaBrutoForm.addEventListener('submit', function() {
-            const modal = bootstrap.Modal.getInstance(document.querySelector('#historiaBrutoModal'));
-            modal._element.querySelectorAll('button').forEach(button => button.disabled = true);
-            modal._element.querySelector('.modal-footer .btn-primary').textContent = 'Procesando...';
-        });
+  // Manejar el envío del formulario de Texto No Estructurado
+  document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
+    const texto = document.getElementById("textoNoEstructurado").value.trim();
+    const errorDiv = document.getElementById("crearAtencionError");
+    errorDiv.style.display = "none";
+    errorDiv.textContent = "";
 
-        // Indicador de carga para el modal de Detalle de Atención en Bruto
-        const detalleBrutoForm = document.querySelector('#detalleBrutoModal form');
-        detalleBrutoForm.addEventListener('submit', function() {
-            const modal = bootstrap.Modal.getInstance(document.querySelector('#detalleBrutoModal'));
-            modal._element.querySelectorAll('button').forEach(button => button.disabled = true);
-            modal._element.querySelector('.modal-footer .btn-primary').textContent = 'Procesando...';
-        });
-    });
+    if (!texto) {
+      errorDiv.textContent = "El texto no puede estar vacío.";
+      errorDiv.style.display = "block";
+      return;
+    }
+
+    fetch("{{ url_for('main.procesar_texto') }}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token() }}"
+      },
+      body: JSON.stringify({ texto })
+    }).then(response => response.json().then(data => ({ status: response.status, body: data })))
+      .then(result => {
+        if (result.status === 200) {
+          window.location.reload();
+        } else {
+          errorDiv.textContent = result.body.error || "Error al procesar el texto.";
+          errorDiv.style.display = "block";
+        }
+      })
+      .catch(() => {
+        errorDiv.textContent = "Error de comunicación con el servidor.";
+        errorDiv.style.display = "block";
+      });
+  });
 </script>
 {% endblock %}

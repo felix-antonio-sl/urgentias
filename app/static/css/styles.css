@@ -1,123 +1,16 @@
 /* Estilos personalizados para Urgentias */
 
-/* Variables de colores */
+/* Variables de colores personalizados */
 :root {
-    --primary-color: #00B2A9;  /* Teal */
+    --primary-color: #00B2A9; /* Teal */
     --secondary-color: #4B0082; /* Indigo */
-    --accent-color: #FFD700;    /* Gold */
-    --text-color: #000000;      /* Black */
-    --background-color: #FFFFFF;/* White */
+    --accent-color: #FFD700; /* Gold */
     --highlight-color: #C71585; /* Medium Violet Red */
-}
 
-/* Aplicar el fondo blanco */
-body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-}
-
-/* Estilos del encabezado */
-header {
-    background-color: var(--primary-color);
-}
-
-header h1 {
-    color: var(--background-color);
-}
-
-header nav a {
-    color: var(--background-color);
-}
-
-header nav a:hover {
-    color: var(--accent-color);
-}
-
-/* Estilos de botones */
-.btn-primary {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-}
-
-.btn-primary:hover {
-    background-color: var(--highlight-color);
-    border-color: var(--highlight-color);
-}
-
-.btn-secondary {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--text-color);
-}
-
-.btn-secondary:hover {
-    background-color: var(--highlight-color);
-    border-color: var(--highlight-color);
-    color: var(--background-color);
-}
-
-/* Estilos de enlaces */
-a {
-    color: var(--secondary-color);
-}
-
-a:hover {
-    color: var(--highlight-color);
-}
-
-/* Estilos de pie de página */
-footer {
-    background-color: var(--primary-color);
-    color: var(--background-color);
-}
-
-/* Estilos de tablas */
-.table thead {
-    background-color: var(--primary-color);
-    color: var(--background-color);
-}
-
-.table tbody tr:hover {
-    background-color: var(--accent-color);
-}
-
-/* Estilos de formularios */
-.form-label {
-    color: var(--text-color);
-}
-
-.form-control {
-    border-color: var(--secondary-color);
-}
-
-.form-control:focus {
-    border-color: var(--highlight-color);
-    box-shadow: 0 0 0 0.2rem rgba(199, 21, 133, 0.25);
-}
-
-/* Estilos de alertas */
-.alert-success {
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    border-color: var(--accent-color);
-}
-
-.alert-danger {
-    background-color: var(--highlight-color);
-    color: var(--background-color);
-    border-color: var(--highlight-color);
-}
-
-/* Estilos de modales */
-.modal-content {
-    background-color: var(--background-color);
-    color: var(--text-color);
-}
-
-.modal-header {
-    border-bottom-color: var(--secondary-color);
-}
-
-.modal-footer {
-    border-top-color: var(--secondary-color);
+    /* Sobrescribir variables de Bootstrap */
+    --bs-primary: var(--primary-color);
+    --bs-secondary: var(--secondary-color);
+    --bs-success: var(--accent-color);
+    --bs-danger: var(--highlight-color);
+    /* Puedes continuar sobrescribiendo otras variables según sea necesario */
 }
