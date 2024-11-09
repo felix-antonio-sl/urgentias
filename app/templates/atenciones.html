@@ -2,7 +2,7 @@
 {% import 'macros.html' as macros %}
 {% block title %}Lista de Atenciones{% endblock %}
 {% block content %}
-<h2>Lista de Atenciones</h2>
+<h2 class="mb-4">Lista de Atenciones</h2>
 
 <!-- Botón para abrir el modal de creación de atención con texto no estructurado -->
 <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearAtencionModal">
@@ -10,105 +10,99 @@
 </button>
 
 <!-- Modal para Ingreso de Texto No Estructurado -->
-<div class="modal fade" id="crearAtencionModal" tabindex="-1" aria-labelledby="crearAtencionModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="crearAtencionForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="crearAtencionModalLabel">Ingresar Detalles de la Atención</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    {{ macros.render_form_field(form_procesar_texto.texto, attrs={'id': 'textoNoEstructurado', 'rows':
-                    5, 'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'}) }}
-                    <div id="crearAtencionError" class="text-danger mt-2" style="display: none;"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="enviarTextoNoEstructurado">Enviar</button>
-                </div>
-            </form>
+<div class="modal fade" id="crearAtencionModal" tabindex="-1" aria-labelledby="crearAtencionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="crearAtencionForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="crearAtencionModalLabel">Ingresar Detalles de la Atención</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
+        <div class="modal-body">
+          {{ macros.render_form_field(form_procesar_texto.texto, attrs={'id': 'textoNoEstructurado', 'rows': 5, 'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'}) }}
+          <div id="crearAtencionError" class="text-danger mt-2 d-none"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="enviarTextoNoEstructurado">Enviar</button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 
 <table class="table table-bordered">
-    <thead class="thead-light">
-        <tr>
-            <th>Tiempo (hh:mm)</th>
-            <th>RUN</th>
-            <th>Nombre</th>
-            <th>Edad</th>
-            <th>Motivo</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for atencion in atenciones %}
-        <tr>
-            <td>{{ atencion.tiempo_desde_creacion }}</td>
-            <td>{{ atencion.paciente.run }}</td>
-            <td>{{ atencion.paciente.nombre }}</td>
-            <td>{{ atencion.paciente.edad }} años</td>
-            <td>
-                <span data-bs-toggle="tooltip" title="{{ atencion.detalle }}">
-                    {{ atencion.obtener_sintesis() }}
-                </span>
-            </td>
-            <td>
-                <a href="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}"
-                    class="btn btn-info btn-sm">Detalles</a>
-                <a href="{{ url_for('main.generar_reporte', atencion_id=atencion.id) }}"
-                    class="btn btn-secondary btn-sm">Reporte</a>
-                <form action="{{ url_for('main.cerrar_atencion', atencion_id=atencion.id) }}" method="POST"
-                    style="display:inline;">
-                    {{ form_cerrar.hidden_tag() }}
-                    {{ form_cerrar.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de cerrar
-                    esta atención?');") }}
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead class="table-light">
+    <tr>
+      <th>Tiempo (hh:mm)</th>
+      <th>RUN</th>
+      <th>Nombre</th>
+      <th>Edad</th>
+      <th>Motivo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for atencion in atenciones %}
+    <tr>
+      <td>{{ atencion.tiempo_desde_creacion }}</td>
+      <td>{{ atencion.paciente.run }}</td>
+      <td>{{ atencion.paciente.nombre }}</td>
+      <td>{{ atencion.paciente.edad }} años</td>
+      <td>
+        <span data-bs-toggle="tooltip" title="{{ atencion.detalle }}">
+          {{ atencion.obtener_sintesis() }}
+        </span>
+      </td>
+      <td>
+        <a href="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}" class="btn btn-info btn-sm">Detalles</a>
+        <a href="{{ url_for('main.generar_reporte', atencion_id=atencion.id) }}" class="btn btn-secondary btn-sm">Reporte</a>
+        <form action="{{ url_for('main.cerrar_atencion', atencion_id=atencion.id) }}" method="POST" style="display:inline;">
+          {{ form_cerrar.hidden_tag() }}
+          {{ form_cerrar.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de cerrar esta atención?');") }}
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // Manejar el envío del formulario de Texto No Estructurado
-    document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
-        const texto = document.getElementById("textoNoEstructurado").value.trim();
-        const errorDiv = document.getElementById("crearAtencionError");
-        errorDiv.style.display = "none";
-        errorDiv.textContent = "";
+  // Manejar el envío del formulario de Texto No Estructurado
+  document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
+    const texto = document.getElementById("textoNoEstructurado").value.trim();
+    const errorDiv = document.getElementById("crearAtencionError");
+    errorDiv.classList.add("d-none");
+    errorDiv.textContent = "";
 
-        if (!texto) {
-            errorDiv.textContent = "El texto no puede estar vacío.";
-            errorDiv.style.display = "block";
-            return;
+    if (!texto) {
+      errorDiv.textContent = "El texto no puede estar vacío.";
+      errorDiv.classList.remove("d-none");
+      return;
+    }
+
+    fetch("{{ url_for('main.procesar_texto') }}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token() }}"
+      },
+      body: JSON.stringify({ texto })
+    }).then(response => response.json().then(data => ({ status: response.status, body: data })))
+      .then(result => {
+        if (result.status === 200) {
+          window.location.reload();
+        } else {
+          errorDiv.textContent = result.body.error || "Error al procesar el texto.";
+          errorDiv.classList.remove("d-none");
         }
-
-        fetch("{{ url_for('main.procesar_texto') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ texto })
-        }).then(response => response.json().then(data => ({ status: response.status, body: data })))
-            .then(result => {
-                if (result.status === 200) {
-                    window.location.reload();
-                } else {
-                    errorDiv.textContent = result.body.error || "Error al procesar el texto.";
-                    errorDiv.style.display = "block";
-                }
-            })
-            .catch(() => {
-                errorDiv.textContent = "Error de comunicación con el servidor.";
-                errorDiv.style.display = "block";
-            });
-    });
+      })
+      .catch(() => {
+        errorDiv.textContent = "Error de comunicación con el servidor.";
+        errorDiv.classList.remove("d-none");
+      });
+  });
 </script>
 {% endblock %}

@@ -1,0 +1,11 @@
+Usted es un asistente que extrae información médica de texto no estructurado.
+
+Por favor, extraiga y devuelva los siguientes datos en formato JSON:
+- run: RUN del paciente (formato '12345678-9').
+- nombre: Nombre completo del paciente.
+- fecha_nacimiento: Fecha de nacimiento en formato dd/mm/aaaa.
+
+Si algún dato no está presente, coloque 'N/A' en su lugar.
+
+Texto:
+{texto_bruto}
