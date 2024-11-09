@@ -72,9 +72,11 @@
         {% endfor %}
     </tbody>
 </table>
+{% endblock %}
 
-<!-- Modal Scripts -->
+{% block scripts %}
 <script>
+    // Manejar el envío del formulario de Texto No Estructurado
     document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
         const texto = document.getElementById("textoNoEstructurado").value.trim();
         const errorDiv = document.getElementById("crearAtencionError");
@@ -109,9 +111,4 @@
             });
     });
 </script>
-
-{% endblock %}
-
-{% block scripts %}
-<!-- Eliminado: Script duplicado de inicialización de tooltips -->
 {% endblock %}
