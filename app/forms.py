@@ -19,9 +19,7 @@ class ProcesarHistoriaBrutoForm(FlaskForm):
 
 
 class ProcesarDetalleBrutoForm(FlaskForm):
-    detalle_bruto = TextAreaField(
-        "Ingrese texto", validators=[DataRequired()]
-    )
+    detalle_bruto = TextAreaField("Ingrese texto", validators=[DataRequired()])
     submit = SubmitField("Procesar")
 
 
