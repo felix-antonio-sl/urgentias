@@ -25,46 +25,46 @@ class AsistenciaMedica(BaseModel):
 
 
 @ell.complex(model="gpt-4o-mini", response_format=AsistenciaMedica)
-def generar_asistencia_medica(historia_paciente: str, detalle_atencion: str):
+def generar_asistencia_medica_ia(historia_conocida: str, atencion_en_curso: str):
     """Eres un médico de emergencias experto en diagnóstico y manejo clínico."""
     prompt_template = load_prompt("generar_asistencia_medica.txt")
     prompt_content = prompt_template.format(
-        historia_paciente=historia_paciente, detalle_atencion=detalle_atencion
+        historia_conocida=historia_conocida, atencion_en_curso=atencion_en_curso
     )
     return [ell.user(prompt_content)]
 
 
 @ell.complex(model="gpt-4o-mini")
-def procesar_historia(historia_actual: str, texto_bruto: str):
+def agregar_nuevos_antecedentes_ia(historia_conocida: str, nuevos_antecedentes: str):
     prompt_template = load_prompt("agregar_antecedentes_medicos.txt")
     prompt_content = prompt_template.format(
-        historia_actual=historia_actual, texto_bruto=texto_bruto
+        historia_conocida=historia_conocida, nuevos_antecedentes=nuevos_antecedentes
     )
     return [ell.user(prompt_content)]
 
 
 @ell.complex(model="gpt-4o-mini")
-def procesar_detalle_atencion(
-    historia_paciente: str, detalle_actual: str, texto_bruto: str
+def agregar_novedades_atencion_ia(
+    historia_conocida: str, atencion_hasta_ahora: str, novedades_atencion: str
 ):
-    prompt_template = load_prompt("agregar_datos_atencion.txt")
+    prompt_template = load_prompt("agregar_novedades_atencion.txt")
     prompt_content = prompt_template.format(
-        historia_paciente=historia_paciente,
-        detalle_actual=detalle_actual,
-        texto_bruto=texto_bruto,
+        historia_conocida=historia_conocida,
+        atencion_hasta_ahora=atencion_hasta_ahora,
+        novedades_atencion=novedades_atencion,
     )
     return [ell.user(prompt_content)]
 
 
 @ell.complex(model="gpt-4o-mini")
-def procesar_texto_no_estructurado(texto_bruto: str):
+def extraer_datos_inicio_paciente_ia(datos_inicio_paciente: str):
     prompt_template = load_prompt("extraer_datos_paciente.txt")
-    prompt_content = prompt_template.format(texto_bruto=texto_bruto)
+    prompt_content = prompt_template.format(datos_inicio_paciente=datos_inicio_paciente)
     return [ell.user(prompt_content)]
 
 
 @ell.complex(model="gpt-4o-mini")
-def generar_reporte(historia_paciente: str, detalle_atencion: str, tipo_reporte: str):
+def generar_reporte_atencion_ia(historia_conocida: str, atencion_en_curso: str, tipo_reporte: str):
     valid_report_types = {
         "alta_ambulatoria": "generar_reporte_alta_ambulatoria.txt",
         "hospitalizacion": "generar_reporte_hospitalizacion.txt",
@@ -77,7 +77,7 @@ def generar_reporte(historia_paciente: str, detalle_atencion: str, tipo_reporte:
     prompt_filename = valid_report_types[tipo_reporte]
     prompt_template = load_prompt(prompt_filename)
     prompt_content = prompt_template.format(
-        historia_paciente=historia_paciente, detalle_atencion=detalle_atencion
+        historia_conocida=historia_conocida, atencion_en_curso=atencion_en_curso
     )
 
     return [ell.user(prompt_content)]

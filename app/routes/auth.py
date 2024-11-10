@@ -19,7 +19,7 @@ def login():
             return (
                 redirect(next_page)
                 if next_page
-                else redirect(url_for("main.lista_atenciones"))
+                else redirect(url_for("main.lista_atenciones_point"))
             )
         else:
             flash("Correo o contraseña incorrectos.", "error")
@@ -48,4 +48,4 @@ def register():
 def logout():
     logout_user()
     flash("Has cerrado sesión correctamente.", "success")
-    return redirect(url_for("main.lista_atenciones"))
+    return redirect(url_for("main.lista_atenciones_point"))

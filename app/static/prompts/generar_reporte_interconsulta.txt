@@ -4,6 +4,6 @@ Historia Clínica:
 {historia_paciente}
 
 Detalle de Atención:
-{detalle_atencion}
+{detalle_atencion_cambiar}
 
 Por favor, genere un reporte de interconsulta para derivar al paciente a un especialista.

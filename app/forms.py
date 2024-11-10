@@ -3,23 +3,23 @@ from wtforms import StringField, TextAreaField, SubmitField, PasswordField, Bool
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
-class ActualizarHistoriaForm(FlaskForm):
-    historia = TextAreaField("Puede editar este texto", validators=[DataRequired()])
+class HistoriaMedicaForm(FlaskForm):
+    historia_medica_text = TextAreaField("Puede editar este texto", validators=[DataRequired()])
     submit = SubmitField("Actualizar")
 
 
-class ActualizarDetalleForm(FlaskForm):
-    detalle = TextAreaField("Puede editar este texto", validators=[DataRequired()])
+class ProgresoAtencionForm(FlaskForm):
+    progreso_atencion_text = TextAreaField("Puede editar este texto", validators=[DataRequired()])
     submit = SubmitField("Actualizar")
 
 
-class ProcesarHistoriaBrutoForm(FlaskForm):
-    historia_bruto = TextAreaField("Ingrese texto", validators=[DataRequired()])
+class NuevosAntecedentesForm(FlaskForm):
+    nuevos_antecedentes_raw_text = TextAreaField("Ingrese texto", validators=[DataRequired()])
     submit = SubmitField("Procesar")
 
 
-class ProcesarDetalleBrutoForm(FlaskForm):
-    detalle_bruto = TextAreaField("Ingrese texto", validators=[DataRequired()])
+class NovedadesAtencionForm(FlaskForm):
+    novedades_atencion_raw_text = TextAreaField("Ingrese texto", validators=[DataRequired()])
     submit = SubmitField("Procesar")
 
 
@@ -39,10 +39,10 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Registrarse")
 
 
-class ProcesarTextoNoEstructuradoForm(FlaskForm):
-    texto = TextAreaField("Ingrese Texto", validators=[DataRequired()])
+class DatosInicioPacienteForm(FlaskForm):
+    datos_inicio_paciente_raw_text = TextAreaField("Ingrese Texto", validators=[DataRequired()])
     submit = SubmitField("Procesar")
 
 
-class CerrarAtencionForm(FlaskForm):
+class CierreAtencionForm(FlaskForm):
     submit = SubmitField("Cerrar")

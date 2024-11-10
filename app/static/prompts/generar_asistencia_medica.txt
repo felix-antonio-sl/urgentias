@@ -9,7 +9,7 @@ Historia Clínica:
 {historia_paciente}
 
 Detalle de Atención:
-{detalle_atencion}
+{detalle_atencion_cambiar}
 
 Responde en formato JSON con el siguiente esquema:
 {json_schema}
