@@ -16,10 +16,7 @@ from ..utils import (
     procesar_detalle_atencion,
     procesar_texto_no_estructurado,
     generar_reporte,  # Importación de la función consolidada
-    generar_diagnostico_diferencial,
-    generar_manejo_sugerido,
-    generar_proxima_accion,
-    generar_alertas,
+    generar_asistencia_medica,  # Importamos la nueva función unificada
 )
 from ..forms import (
     ActualizarHistoriaForm,
@@ -130,35 +127,28 @@ def actualizar_informacion_ai(atencion):
 
     logger.info(f"Actualizando información AI para Atención ID: {atencion.id}")
 
-    # Generación de información AI
+    # Generación de información AI unificada
     try:
-        diagnostico_msg = generar_diagnostico_diferencial(
+        asistencia_msg = generar_asistencia_medica(
             paciente.historia or "", atencion.detalle or ""
         )
-        manejo_msg = generar_manejo_sugerido(
-            paciente.historia or "", atencion.detalle or ""
-        )
-        accion_msg = generar_proxima_accion(
-            paciente.historia or "", atencion.detalle or ""
-        )
-        alertas_msg = generar_alertas(paciente.historia or "", atencion.detalle or "")
     except Exception as e:
-        logger.error(f"Error al llamar a las funciones AI: {e}")
+        logger.error(f"Error al llamar a la función generar_asistencia_medica: {e}")
         raise
 
     # Asignación de los resultados parseados
     try:
         atencion.diagnostico_diferencial = "\n".join(
-            diagnostico_msg.parsed.diagnosticos
+            asistencia_msg.parsed.diagnostico_diferencial
         )
-        atencion.manejo_sugerido = manejo_msg.parsed.manejo
-        atencion.proxima_accion = accion_msg.parsed.accion
-        atencion.alertas = "\n".join(alertas_msg.parsed.alertas)
+        atencion.manejo_sugerido = asistencia_msg.parsed.manejo_sugerido
+        atencion.proxima_accion = asistencia_msg.parsed.proxima_accion
+        atencion.alertas = "\n".join(asistencia_msg.parsed.alertas)
     except AttributeError as e:
-        logger.error(f"Error al asignar los resultados AI: {e}")
+        logger.error(f"Error al asignar los resultados de asistencia AI: {e}")
         raise
 
-    atencion.actualizado_en = datetime.now(timezone.utc)  # Actualizado
+    atencion.actualizado_en = datetime.now(timezone.utc)
     db.session.commit()
     logger.info(f"Información AI actualizada para Atención ID: {atencion.id}")
 
