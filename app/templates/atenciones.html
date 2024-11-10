@@ -65,8 +65,11 @@
       <td>
         <a href="{{ url_for('main.detalle_atencion', atencion_id=atencion.id) }}"
           class="btn btn-info btn-sm">Detalles</a>
-        <a href="{{ url_for('main.generar_reporte', atencion_id=atencion.id) }}"
-          class="btn btn-secondary btn-sm">Reporte</a>
+        <!-- Botón para abrir el modal de selección de reporte -->
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+          data-bs-target="#seleccionarReporteModal" data-atencion-id="{{ atencion.id }}">
+          Reporte
+        </button>
         <form action="{{ url_for('main.cerrar_atencion', atencion_id=atencion.id) }}" method="POST"
           style="display:inline;">
           {{ form_cerrar.hidden_tag() }}
@@ -78,7 +81,38 @@
     {% endfor %}
   </tbody>
 </table>
+<!-- Modal de Selección de Tipo de Reporte -->
+<div class="modal fade" id="seleccionarReporteModal" tabindex="-1" aria-labelledby="seleccionarReporteModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="seleccionarReporteModalLabel">Generar Reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>Seleccione el tipo de reporte que desea generar:</p>
+        <ul class="list-group">
+          <li class="list-group-item">
+            <a href="#" class="btn btn-link" data-report-type="alta_ambulatoria">Alta Ambulatoria</a>
+          </li>
+          <li class="list-group-item">
+            <a href="#" class="btn btn-link" data-report-type="hospitalizacion">Hospitalización</a>
+          </li>
+          <li class="list-group-item">
+            <a href="#" class="btn btn-link" data-report-type="interconsulta">Interconsulta</a>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
+
 
 {% block scripts %}
 <script>
@@ -115,6 +149,29 @@
         errorDiv.textContent = "Error de comunicación con el servidor.";
         errorDiv.classList.remove("d-none");
       });
+  });
+
+  // Script para seleccionar el tipo de reporte y generar la URL
+  let currentAtencionId = null;
+  var seleccionarReporteModal = document.getElementById('seleccionarReporteModal');
+  seleccionarReporteModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    currentAtencionId = button.getAttribute('data-atencion-id');
+  });
+
+  var reportLinks = seleccionarReporteModal.querySelectorAll('[data-report-type]');
+  reportLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (!currentAtencionId) {
+        alert('Error: No se pudo obtener el ID de la atención.');
+        return;
+      }
+      var tipoReporte = this.getAttribute('data-report-type');
+      var url = "{{ url_for('main.generar_reporte', atencion_id='ATENCION_ID', tipo_reporte='TIPO_REPORTE') }}";
+      url = url.replace('ATENCION_ID', currentAtencionId).replace('TIPO_REPORTE', tipoReporte);
+      window.location.href = url;
+    });
   });
 </script>
 {% endblock %}

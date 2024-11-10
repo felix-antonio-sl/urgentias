@@ -11,25 +11,33 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Definición de modelos de salida estructurados
 class DiagnosticoDiferencial(BaseModel):
-    diagnosticos: list[str] = Field(description="Lista de posibles diagnósticos diferenciales.")
+    diagnosticos: list[str] = Field(
+        description="Lista de posibles diagnósticos diferenciales."
+    )
+
 
 class ManejoSugerido(BaseModel):
     manejo: str = Field(description="Recomendaciones de manejo clínico.")
 
+
 class ProximaAccion(BaseModel):
     accion: str = Field(description="Próxima acción más importante a realizar.")
 
+
 class Alertas(BaseModel):
     alertas: list[str] = Field(description="Lista de amenazas o riesgos identificados.")
+
 
 # Funciones AI utilizando ell con mensajes estructurados
 @ell.complex(model="gpt-4o-mini", response_format=DiagnosticoDiferencial)
 def generar_diagnostico_diferencial(historia_paciente: str, detalle_atencion: str):
     """Eres un médico de emergencias experto en diagnóstico diferencial."""
     return [
-        ell.user(f"""
+        ell.user(
+            f"""
 Basándote en la siguiente información, proporciona una lista de posibles diagnósticos diferenciales:
 
 Historia Clínica:
@@ -40,14 +48,17 @@ Detalle de Atención:
 
 Responde en formato JSON con el siguiente esquema:
 {json.dumps(DiagnosticoDiferencial.model_json_schema(), indent=2)}
-""")
+"""
+        )
     ]
+
 
 @ell.complex(model="gpt-4o-mini", response_format=ManejoSugerido)
 def generar_manejo_sugerido(historia_paciente: str, detalle_atencion: str):
     """Eres un médico de emergencias experto en manejo clínico."""
     return [
-        ell.user(f"""
+        ell.user(
+            f"""
 Basándote en la siguiente información, proporciona recomendaciones de manejo alineadas con las guías actuales:
 
 Historia Clínica:
@@ -58,14 +69,17 @@ Detalle de Atención:
 
 Responde en formato JSON con el siguiente esquema:
 {json.dumps(ManejoSugerido.model_json_schema(), indent=2)}
-""")
+"""
+        )
     ]
+
 
 @ell.complex(model="gpt-4o-mini", response_format=ProximaAccion)
 def generar_proxima_accion(historia_paciente: str, detalle_atencion: str):
     """Eres un médico de emergencias priorizando acciones clínicas."""
     return [
-        ell.user(f"""
+        ell.user(
+            f"""
 Basándote en la siguiente información, indica la próxima acción más importante:
 
 Historia Clínica:
@@ -76,14 +90,17 @@ Detalle de Atención:
 
 Responde en formato JSON con el siguiente esquema:
 {json.dumps(ProximaAccion.model_json_schema(), indent=2)}
-""")
+"""
+        )
     ]
+
 
 @ell.complex(model="gpt-4o-mini", response_format=Alertas)
 def generar_alertas(historia_paciente: str, detalle_atencion: str):
     """Eres un médico de emergencias atento a posibles riesgos."""
     return [
-        ell.user(f"""
+        ell.user(
+            f"""
 Basándote en la siguiente información, proporciona una lista de posibles amenazas o riesgos:
 
 Historia Clínica:
@@ -94,8 +111,10 @@ Detalle de Atención:
 
 Responde en formato JSON con el siguiente esquema:
 {json.dumps(Alertas.model_json_schema(), indent=2)}
-""")
+"""
+        )
     ]
+
 
 # Funciones auxiliares existentes
 def load_prompt(filename):
@@ -105,6 +124,7 @@ def load_prompt(filename):
     with open(prompt_path, "r", encoding="utf-8") as file:
         return file.read()
 
+
 @ell.complex(model="gpt-4o-mini")
 def procesar_historia(historia_actual: str, texto_bruto: str):
     """Procesa la historia clínica actualizada."""
@@ -113,6 +133,7 @@ def procesar_historia(historia_actual: str, texto_bruto: str):
         historia_actual=historia_actual, texto_bruto=texto_bruto
     )
     return [ell.user(prompt_content)]
+
 
 @ell.complex(model="gpt-4o-mini")
 def procesar_detalle_atencion(
@@ -134,3 +155,54 @@ def procesar_texto_no_estructurado(texto_bruto: str):
     prompt_template = load_prompt("procesar_texto_no_estructurado.txt")
     prompt_content = prompt_template.format(texto_bruto=texto_bruto)
     return [ell.user(prompt_content)]
+
+
+@ell.simple(model="gpt-4o-mini")
+def generar_reporte_alta_ambulatoria(historia_paciente: str, detalle_atencion: str):
+    """Genera un reporte de alta ambulatoria."""
+    prompt = f"""
+    Usted es un asistente médico que genera reportes de alta ambulatoria.
+
+    Historia Clínica:
+    {historia_paciente}
+
+    Detalle de Atención:
+    {detalle_atencion}
+
+    Por favor, genere un reporte conciso y claro para el alta ambulatoria del paciente.
+    """
+    return prompt
+
+
+@ell.simple(model="gpt-4o-mini")
+def generar_reporte_hospitalizacion(historia_paciente: str, detalle_atencion: str):
+    """Genera una solicitud de hospitalización."""
+    prompt = f"""
+    Usted es un asistente médico que genera solicitudes de hospitalización.
+
+    Historia Clínica:
+    {historia_paciente}
+
+    Detalle de Atención:
+    {detalle_atencion}
+
+    Por favor, genere una solicitud de hospitalización detallada para el paciente.
+    """
+    return prompt
+
+
+@ell.simple(model="gpt-4o-mini")
+def generar_reporte_interconsulta(historia_paciente: str, detalle_atencion: str):
+    """Genera un reporte de interconsulta a especialista."""
+    prompt = f"""
+    Usted es un asistente médico que genera reportes de interconsulta.
+
+    Historia Clínica:
+    {historia_paciente}
+
+    Detalle de Atención:
+    {detalle_atencion}
+
+    Por favor, genere un reporte de interconsulta para derivar al paciente a un especialista.
+    """
+    return prompt

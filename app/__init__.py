@@ -8,6 +8,12 @@ import os
 import ell
 from flask_wtf import CSRFProtect
 from flask_login import LoginManager
+from markupsafe import Markup, escape
+
+
+# Definición del filtro nl2br
+def nl2br(value):
+    return Markup("<br>".join(escape(value).split("\n")))
 
 
 db = SQLAlchemy()
@@ -45,6 +51,9 @@ def create_app(config_class=DevelopmentConfig):
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
     csrf.init_app(app)
+
+    # Registrar el filtro nl2br
+    app.jinja_env.filters["nl2br"] = nl2br
 
     from .routes.main import main as main_bp
 

@@ -19,6 +19,9 @@ from ..utils import (
     generar_manejo_sugerido,
     generar_proxima_accion,
     generar_alertas,
+    generar_reporte_alta_ambulatoria,
+    generar_reporte_hospitalizacion,
+    generar_reporte_interconsulta,
 )
 from ..forms import (
     ActualizarHistoriaForm,
@@ -28,6 +31,7 @@ from ..forms import (
     ProcesarTextoNoEstructuradoForm,
     CerrarAtencionForm,
 )
+
 from flask_login import login_required, current_user
 from datetime import datetime
 import json
@@ -275,18 +279,6 @@ def extraer_json(respuesta):
         raise ValueError("No se encontró un bloque JSON en la respuesta.")
 
 
-@main.route("/generar_reporte/<string:atencion_id>")
-@login_required
-def generar_reporte(atencion_id):
-    atencion = Atencion.query.get_or_404(atencion_id)
-    pdf = BytesIO()
-    pdf.write(b"%PDF-1.4\n%...")
-    pdf.seek(0)
-    return send_file(
-        pdf, as_attachment=True, download_name="reporte.pdf", mimetype="application/pdf"
-    )
-
-
 @main.route("/cerrar_atencion/<string:atencion_id>", methods=["POST"])
 @login_required
 def cerrar_atencion(atencion_id):
@@ -317,3 +309,33 @@ def register_error_handlers(app):
     @app.errorhandler(403)
     def forbidden_error(error):
         return render_template("403.html"), 403
+
+
+@main.route("/generar_reporte/<string:atencion_id>/<string:tipo_reporte>")
+@login_required
+def generar_reporte(atencion_id, tipo_reporte):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    paciente = atencion.paciente
+
+    # Obtener los datos necesarios
+    historia_paciente = paciente.historia or ""
+    detalle_atencion = atencion.detalle or ""
+
+    # Generar el reporte según el tipo
+    if tipo_reporte == "alta_ambulatoria":
+        reporte = generar_reporte_alta_ambulatoria(historia_paciente, detalle_atencion)
+        titulo = "Reporte de Alta Ambulatoria"
+    elif tipo_reporte == "hospitalizacion":
+        reporte = generar_reporte_hospitalizacion(historia_paciente, detalle_atencion)
+        titulo = "Solicitud de Hospitalización"
+    elif tipo_reporte == "interconsulta":
+        reporte = generar_reporte_interconsulta(historia_paciente, detalle_atencion)
+        titulo = "Reporte de Interconsulta"
+    else:
+        flash("Tipo de reporte no válido.", "danger")
+        return redirect(url_for("main.lista_atenciones"))
+
+    # Renderizar la plantilla con el reporte
+    return render_template(
+        "ver_reporte.html", titulo=titulo, reporte=reporte, atencion=atencion
+    )
