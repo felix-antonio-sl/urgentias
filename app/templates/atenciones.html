@@ -168,7 +168,7 @@
         return;
       }
       var tipoReporte = this.getAttribute('data-report-type');
-      var url = "{{ url_for('main.generar_reporte', atencion_id='ATENCION_ID', tipo_reporte='TIPO_REPORTE') }}";
+      var url = "{{ url_for('main.generar_reporte_route', atencion_id='ATENCION_ID', tipo_reporte='TIPO_REPORTE') }}";
       url = url.replace('ATENCION_ID', currentAtencionId).replace('TIPO_REPORTE', tipoReporte);
       window.location.href = url;
     });

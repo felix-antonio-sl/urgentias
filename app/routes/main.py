@@ -15,13 +15,11 @@ from ..utils import (
     procesar_historia,
     procesar_detalle_atencion,
     procesar_texto_no_estructurado,
+    generar_reporte,  # Importación de la función consolidada
     generar_diagnostico_diferencial,
     generar_manejo_sugerido,
     generar_proxima_accion,
     generar_alertas,
-    generar_reporte_alta_ambulatoria,
-    generar_reporte_hospitalizacion,
-    generar_reporte_interconsulta,
 )
 from ..forms import (
     ActualizarHistoriaForm,
@@ -311,31 +309,46 @@ def register_error_handlers(app):
         return render_template("403.html"), 403
 
 
-@main.route("/generar_reporte/<string:atencion_id>/<string:tipo_reporte>")
+@main.route(
+    "/generar_reporte/<string:atencion_id>/<string:tipo_reporte>", methods=["GET"]
+)
 @login_required
-def generar_reporte(atencion_id, tipo_reporte):
+def generar_reporte_route(atencion_id, tipo_reporte):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
+
+    # Validar el tipo de reporte
+    valid_report_types = ["alta_ambulatoria", "hospitalizacion", "interconsulta"]
+    if tipo_reporte not in valid_report_types:
+        flash("Tipo de reporte no válido.", "danger")
+        return redirect(url_for("main.lista_atenciones"))
 
     # Obtener los datos necesarios
     historia_paciente = paciente.historia or ""
     detalle_atencion = atencion.detalle or ""
 
-    # Generar el reporte según el tipo
-    if tipo_reporte == "alta_ambulatoria":
-        reporte = generar_reporte_alta_ambulatoria(historia_paciente, detalle_atencion)
-        titulo = "Reporte de Alta Ambulatoria"
-    elif tipo_reporte == "hospitalizacion":
-        reporte = generar_reporte_hospitalizacion(historia_paciente, detalle_atencion)
-        titulo = "Solicitud de Hospitalización"
-    elif tipo_reporte == "interconsulta":
-        reporte = generar_reporte_interconsulta(historia_paciente, detalle_atencion)
-        titulo = "Reporte de Interconsulta"
-    else:
-        flash("Tipo de reporte no válido.", "danger")
-        return redirect(url_for("main.lista_atenciones"))
+    try:
+        # Llamar a la nueva función consolidada para generar el reporte
+        reporte_message = generar_reporte(
+            historia_paciente, detalle_atencion, tipo_reporte
+        )
 
-    # Renderizar la plantilla con el reporte
-    return render_template(
-        "ver_reporte.html", titulo=titulo, reporte=reporte, atencion=atencion
-    )
+        # Obtener el texto del reporte desde el mensaje de ell
+        reporte_text = reporte_message.text
+
+        # Determinar el título del reporte basado en el tipo
+        titulos = {
+            "alta_ambulatoria": "Reporte de Alta Ambulatoria",
+            "hospitalizacion": "Solicitud de Hospitalización",
+            "interconsulta": "Reporte de Interconsulta",
+        }
+        titulo = titulos.get(tipo_reporte, "Reporte Médico")
+
+        # Renderizar la plantilla con el reporte
+        return render_template(
+            "ver_reporte.html", titulo=titulo, reporte=reporte_text, atencion=atencion
+        )
+    except Exception as e:
+        logger.error(f"Error al generar el reporte: {e}")
+        flash("Ocurrió un error al generar el reporte.", "danger")
+        return redirect(url_for("main.lista_atenciones"))

@@ -1,7 +1,0 @@
-Historia actual:
-{historia_actual}
-
-Nuevo texto en bruto:
-{texto_bruto}
-
-Por favor, genera una historia clínica actualizada y coherente.
