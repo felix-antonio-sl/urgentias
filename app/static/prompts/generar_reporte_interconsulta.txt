@@ -1,9 +1,9 @@
 Usted es un asistente médico que genera reportes de interconsulta.
 
 Historia Clínica:
-{historia_paciente}
+{historia_conocida}
 
 Detalle de Atención:
-{detalle_atencion_cambiar}
+{atencion_en_curso}
 
 Por favor, genere un reporte de interconsulta para derivar al paciente a un especialista.

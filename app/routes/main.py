@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 @main.route("/")
 @login_required
-def lista_atenciones_controller():
+def lista_atenciones_route():
     atenciones = (
         Atencion.query.filter_by(activa=True).order_by(Atencion.creado_en.desc()).all()
     )
@@ -53,13 +53,13 @@ def lista_atenciones_controller():
         "lista_atenciones_view.html",
         atenciones=atenciones,
         form_cierre_atencion=form_cierre_atencion,
-        form_procesar_texto=form_datos_inicio_paciente,
+        form_datos_inicio_paciente=form_datos_inicio_paciente,
     )
 
 
-@main.route("/detalle_atencion_point/<string:atencion_id>", methods=["GET", "POST"])
+@main.route("/detalle_atencion_route/<string:atencion_id>", methods=["GET", "POST"])
 @login_required
-def detalle_atencion_controller(atencion_id):
+def detalle_atencion_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
@@ -80,7 +80,7 @@ def detalle_atencion_controller(atencion_id):
                 "Historia actualizada. La información AI no está disponible temporalmente.",
                 "warning",
             )
-        return redirect(url_for("main.detalle_atencion_point", atencion_id=atencion_id))
+        return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
     elif (
         form_progreso_atencion.validate_on_submit()
@@ -99,7 +99,7 @@ def detalle_atencion_controller(atencion_id):
                 "Detalle actualizado. La información AI no está disponible temporalmente.",
                 "warning",
             )
-        return redirect(url_for("main.detalle_atencion_point", atencion_id=atencion_id))
+        return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
     if request.method == "GET":
         form_historia_medica.historia_medica_text.data = paciente.historia
@@ -116,16 +116,18 @@ def detalle_atencion_controller(atencion_id):
     )
 
 
-@main.route("/nuevos_antecedentes_point/<string:atencion_id>", methods=["POST"])
+@main.route("/nuevos_antecedentes_route/<string:atencion_id>", methods=["POST"])
 @login_required
-def nuevos_antecedentes_controller(atencion_id):
+def nuevos_antecedentes_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
     # Añadir el prefijo al formulario
     form_nuevos_antecedentes = NuevosAntecedentesForm(prefix="procesar_historia_modal")
     if form_nuevos_antecedentes.validate_on_submit():
-        nuevos_antecedentes_raw = form_nuevos_antecedentes.nuevos_antecedentes_raw_text.data
+        nuevos_antecedentes_raw = (
+            form_nuevos_antecedentes.nuevos_antecedentes_raw_text.data
+        )
         historia_actualizada = agregar_nuevos_antecedentes_ia(
             paciente.historia or "", nuevos_antecedentes_raw
         )
@@ -139,19 +141,21 @@ def nuevos_antecedentes_controller(atencion_id):
         )
         flash("Error al procesar la historia.", "error")
 
-    return redirect(url_for("main.detalle_atencion_point", atencion_id=atencion_id))
+    return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
 
-@main.route("/novedades_atencion_point/<string:atencion_id>", methods=["POST"])
+@main.route("/novedades_atencion_route/<string:atencion_id>", methods=["POST"])
 @login_required
-def novedades_atencion_controller(atencion_id):
+def novedades_atencion_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
     # Añadir el prefijo al formulario
     form_novedades_atencion = NovedadesAtencionForm(prefix="procesar_detalle_modal")
     if form_novedades_atencion.validate_on_submit():
-        novedades_atencion_raw = form_novedades_atencion.novedades_atencion_raw_text.data
+        novedades_atencion_raw = (
+            form_novedades_atencion.novedades_atencion_raw_text.data
+        )
         progreso_atencion_actualizado = agregar_novedades_atencion_ia(
             paciente.historia or "", atencion.detalle or "", novedades_atencion_raw
         )
@@ -165,12 +169,12 @@ def novedades_atencion_controller(atencion_id):
         )
         flash("Error al procesar el detalle de atención.", "error")
 
-    return redirect(url_for("main.detalle_atencion_point", atencion_id=atencion_id))
+    return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
 
-@main.route("/extraccion_datos_inicio_paciente_point", methods=["POST"])
+@main.route("/extraccion_datos_inicio_paciente_route", methods=["POST"])
 @login_required
-def extraccion_datos_inicio_paciente_controller():
+def extraccion_datos_inicio_paciente_route():
     data = request.get_json()
     texto = data.get("texto")
 
@@ -223,10 +227,9 @@ def extraccion_datos_inicio_paciente_controller():
     return jsonify({"message": "Atención creada exitosamente."}), 200
 
 
-
-@main.route("/cierre_atencion_point/<string:atencion_id>", methods=["POST"])
+@main.route("/cierre_atencion_route/<string:atencion_id>", methods=["POST"])
 @login_required
-def cierre_atencion_controller(atencion_id):
+def cierre_atencion_route(atencion_id):
     form = CierreAtencionForm()
     if form.validate_on_submit():
         atencion = Atencion.query.get_or_404(atencion_id)
@@ -236,7 +239,7 @@ def cierre_atencion_controller(atencion_id):
         flash("Atención cerrada exitosamente.", "success")
     else:
         flash("Error al cerrar la atención.", "error")
-    return redirect(url_for("main.lista_atenciones_point"))
+    return redirect(url_for("main.lista_atenciones_route"))
 
 
 def register_error_handlers(app):
@@ -260,7 +263,7 @@ def register_error_handlers(app):
     "/generar_reporte/<string:atencion_id>/<string:tipo_reporte>", methods=["GET"]
 )
 @login_required
-def generacion_reporte_controller(atencion_id, tipo_reporte):
+def generacion_reporte_route(atencion_id, tipo_reporte):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
@@ -268,7 +271,7 @@ def generacion_reporte_controller(atencion_id, tipo_reporte):
     valid_report_types = ["alta_ambulatoria", "hospitalizacion", "interconsulta"]
     if tipo_reporte not in valid_report_types:
         flash("Tipo de reporte no válido.", "danger")
-        return redirect(url_for("main.lista_atenciones_point"))
+        return redirect(url_for("main.lista_atenciones_route"))
 
     # Obtener los datos necesarios
     historia_conocida = paciente.historia or ""
@@ -293,12 +296,15 @@ def generacion_reporte_controller(atencion_id, tipo_reporte):
 
         # Renderizar la plantilla con el reporte
         return render_template(
-            "ver_reporte_view.html", titulo=titulo, reporte=reporte_text, atencion=atencion
+            "ver_reporte_view.html",
+            titulo=titulo,
+            reporte=reporte_text,
+            atencion=atencion,
         )
     except Exception as e:
         logger.error(f"Error al generar el reporte: {e}")
         flash("Ocurrió un error al generar el reporte.", "danger")
-        return redirect(url_for("main.lista_atenciones_point"))
+        return redirect(url_for("main.lista_atenciones_route"))
 
 
 # Funciones auxiliares
@@ -342,6 +348,7 @@ def obtener_sintesis(detalle, longitud=25):
         if detalle and len(detalle) > longitud
         else detalle or "Sin detalle"
     )
+
 
 def extraer_json(respuesta):
     match = re.search(r"```json(.*?)```", respuesta, re.DOTALL)

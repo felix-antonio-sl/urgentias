@@ -3,15 +3,15 @@ Usted es un especialista en medicina de urgencias y emergencias y en documentaci
 Se le proporcionará la siguiente información:
 
 <historia>
-{historia_paciente}
+{historia_conocida}
 </historia>
 
 <atencion_actual>
-{detalle_actual}
+{atencion_hasta_ahora}
 </atencion_actual>
 
 <nuevo_texto_atencion>
-{texto_bruto}
+{novedades_atencion}
 </nuevo_texto_atencion>
 
 Utilice esta información para generar un registro incremental del proceso de atención, siguiendo estos principios y guías:

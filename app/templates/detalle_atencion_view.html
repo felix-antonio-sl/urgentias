@@ -23,9 +23,9 @@
     <!-- Columna de Actualizar Historia Clínica -->
     <div class="col-md-6">
       <h4>Historia Clínica</h4>
-      <form method="POST" action="{{ url_for('main.detalle_atencion_point', atencion_id=atencion.id) }}">
+      <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
         {{ form_historia_medica.hidden_tag() }}
-        {{ macros.render_form_field(form_historia_medica.historia, attrs={'rows': 10, 'id': 'historiaClinica'}) }}
+        {{ macros.render_form_field(form_historia_medica.historia_medica_text, attrs={'rows': 10, 'id': 'historiaClinica'}) }}
         <div class="d-flex">
           {{ form_historia_medica.submit(class="btn btn-primary me-2") }}
           <!-- Botón para abrir el modal de Historia en Bruto -->
@@ -39,9 +39,9 @@
     <!-- Columna de Actualizar Detalle de Atención Actual -->
     <div class="col-md-6">
       <h4>Atención Actual</h4>
-      <form method="POST" action="{{ url_for('main.detalle_atencion_point', atencion_id=atencion.id) }}">
+      <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
         {{ form_progreso_atencion.hidden_tag() }}
-        {{ macros.render_form_field(form_progreso_atencion.detalle, attrs={'rows': 10, 'id': 'detalleAtencion'}) }}
+        {{ macros.render_form_field(form_progreso_atencion.progreso_atencion_text, attrs={'rows': 10, 'id': 'detalleAtencion'}) }}
         <div class="d-flex">
           {{ form_progreso_atencion.submit(class="btn btn-primary me-2") }}
           <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
@@ -81,14 +81,14 @@
     aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form method="POST" action="{{ url_for('main.nuevos_antecedentes_point', atencion_id=atencion.id) }}">
+        <form method="POST" action="{{ url_for('main.nuevos_antecedentes_route', atencion_id=atencion.id) }}">
           {{ form_nuevos_antecedentes.hidden_tag() }}
           <div class="modal-header">
             <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Historia en Bruto</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
-            {{ macros.render_form_field(form_nuevos_antecedentes.nuevos_antecedentes_raw, attrs={'id': 'historiaBruto', 'rows': 5})
+            {{ macros.render_form_field(form_nuevos_antecedentes.nuevos_antecedentes_raw_text, attrs={'id': 'historiaBruto', 'rows': 5})
             }}
           </div>
           <div class="modal-footer">
@@ -105,14 +105,14 @@
     aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form method="POST" action="{{ url_for('main.novedades_atencion_point', atencion_id=atencion.id) }}">
+        <form method="POST" action="{{ url_for('main.novedades_atencion_route', atencion_id=atencion.id) }}">
           {{ form_novedades_atencion.hidden_tag() }}
           <div class="modal-header">
             <h5 class="modal-title" id="detalleBrutoModalLabel">Procesar Detalle de Atención en Bruto</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
-            {{ macros.render_form_field(form_novedades_atencion.detalle_bruto, attrs={'id': 'detalleBruto', 'rows': 5}) }}
+            {{ macros.render_form_field(form_novedades_atencion.novedades_atencion_raw_text, attrs={'id': 'detalleBruto', 'rows': 5}) }}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -142,7 +142,7 @@
       return;
     }
 
-    fetch("{{ url_for('main.extraccion_datos_inicio_paciente_point') }}", {
+    fetch("{{ url_for('main.extraccion_datos_inicio_paciente_route') }}", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

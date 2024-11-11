@@ -29,7 +29,9 @@ def generar_asistencia_medica_ia(historia_conocida: str, atencion_en_curso: str)
     """Eres un médico de emergencias experto en diagnóstico y manejo clínico."""
     prompt_template = load_prompt("generar_asistencia_medica.txt")
     prompt_content = prompt_template.format(
-        historia_conocida=historia_conocida, atencion_en_curso=atencion_en_curso
+        historia_conocida=historia_conocida,
+        atencion_en_curso=atencion_en_curso,
+        json_schema=json.dumps(AsistenciaMedica.model_json_schema(), indent=2),
     )
     return [ell.user(prompt_content)]
 
@@ -64,7 +66,9 @@ def extraer_datos_inicio_paciente_ia(datos_inicio_paciente: str):
 
 
 @ell.complex(model="gpt-4o-mini")
-def generar_reporte_atencion_ia(historia_conocida: str, atencion_en_curso: str, tipo_reporte: str):
+def generar_reporte_atencion_ia(
+    historia_conocida: str, atencion_en_curso: str, tipo_reporte: str
+):
     valid_report_types = {
         "alta_ambulatoria": "generar_reporte_alta_ambulatoria.txt",
         "hospitalizacion": "generar_reporte_hospitalizacion.txt",

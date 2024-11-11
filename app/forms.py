@@ -4,22 +4,30 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo
 
 
 class HistoriaMedicaForm(FlaskForm):
-    historia_medica_text = TextAreaField("Puede editar este texto", validators=[DataRequired()])
+    historia_medica_text = TextAreaField(
+        "Puede editar este texto", validators=[DataRequired()]
+    )
     submit = SubmitField("Actualizar")
 
 
 class ProgresoAtencionForm(FlaskForm):
-    progreso_atencion_text = TextAreaField("Puede editar este texto", validators=[DataRequired()])
+    progreso_atencion_text = TextAreaField(
+        "Puede editar este texto", validators=[DataRequired()]
+    )
     submit = SubmitField("Actualizar")
 
 
 class NuevosAntecedentesForm(FlaskForm):
-    nuevos_antecedentes_raw_text = TextAreaField("Ingrese texto", validators=[DataRequired()])
+    nuevos_antecedentes_raw_text = TextAreaField(
+        "Ingrese texto", validators=[DataRequired()]
+    )
     submit = SubmitField("Procesar")
 
 
 class NovedadesAtencionForm(FlaskForm):
-    novedades_atencion_raw_text = TextAreaField("Ingrese texto", validators=[DataRequired()])
+    novedades_atencion_raw_text = TextAreaField(
+        "Ingrese texto", validators=[DataRequired()]
+    )
     submit = SubmitField("Procesar")
 
 
@@ -40,7 +48,9 @@ class RegisterForm(FlaskForm):
 
 
 class DatosInicioPacienteForm(FlaskForm):
-    datos_inicio_paciente_raw_text = TextAreaField("Ingrese Texto", validators=[DataRequired()])
+    datos_inicio_paciente_raw_text = TextAreaField(
+        "Ingrese Texto", validators=[DataRequired()]
+    )
     submit = SubmitField("Procesar")
 
 

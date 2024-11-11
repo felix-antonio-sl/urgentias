@@ -8,4 +8,4 @@ Por favor, extraiga y devuelva los siguientes datos en formato JSON:
 Si algún dato no está presente, coloque 'N/A' en su lugar.
 
 Texto:
-{texto_bruto}
+{datos_inicio_paciente}

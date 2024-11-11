@@ -20,7 +20,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          {{ macros.render_form_field(form_procesar_texto.texto, attrs={'id': 'textoNoEstructurado', 'rows': 5,
+          {{ macros.render_form_field(form_datos_inicio_paciente.datos_inicio_paciente_raw_text, attrs={'id': 'textoNoEstructurado', 'rows': 5,
           'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'}) }}
           <div id="crearAtencionError" class="text-danger mt-2 d-none"></div>
         </div>
@@ -63,14 +63,14 @@
         </span>
       </td>
       <td>
-        <a href="{{ url_for('main.detalle_atencion_point', atencion_id=atencion.id) }}"
+        <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}"
           class="btn btn-info btn-sm">Detalles</a>
         <!-- Botón para abrir el modal de selección de reporte -->
         <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
           data-bs-target="#seleccionarReporteModal" data-atencion-id="{{ atencion.id }}">
           Reporte
         </button>
-        <form action="{{ url_for('main.cierre_atencion_point', atencion_id=atencion.id) }}" method="POST"
+        <form action="{{ url_for('main.cierre_atencion_route', atencion_id=atencion.id) }}" method="POST"
           style="display:inline;">
           {{ form_cierre_atencion.hidden_tag() }}
           {{ form_cierre_atencion.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de cerrar esta
@@ -129,7 +129,7 @@
       return;
     }
 
-    fetch("{{ url_for('main.extraccion_datos_inicio_paciente_point') }}", {
+    fetch("{{ url_for('main.extraccion_datos_inicio_paciente_route') }}", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -168,7 +168,7 @@
         return;
       }
       var tipoReporte = this.getAttribute('data-report-type');
-      var url = "{{ url_for('main.generaracion_reporte_point', atencion_id='ATENCION_ID', tipo_reporte='TIPO_REPORTE') }}";
+      var url = "{{ url_for('main.generacion_reporte_route', atencion_id='ATENCION_ID', tipo_reporte='TIPO_REPORTE') }}";
       url = url.replace('ATENCION_ID', currentAtencionId).replace('TIPO_REPORTE', tipoReporte);
       window.location.href = url;
     });

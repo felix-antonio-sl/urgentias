@@ -5,11 +5,11 @@ Basándote en la siguiente información, proporciona los siguientes datos:
 - La próxima acción más importante a realizar.
 - Una lista de posibles amenazas o riesgos.
 
-Historia Clínica:
-{historia_paciente}
+Historia Médica Conocida hasta elmomento:
+{historia_conocida}
 
-Detalle de Atención:
-{detalle_atencion_cambiar}
+Registro hasta el momento del progreso de la atención actual:
+{atencion_en_curso}
 
 Responde en formato JSON con el siguiente esquema:
 {json_schema}
