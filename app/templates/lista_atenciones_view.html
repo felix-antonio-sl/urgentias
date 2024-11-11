@@ -2,13 +2,11 @@
 {% import 'macros.html' as macros %}
 {% block title %}Lista de Atenciones{% endblock %}
 {% block content %}
-<h2 class="mb-4">Lista de Atenciones</h2>
-
-<!-- Botón para abrir el modal de creación de atención con texto no estructurado -->
-<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearAtencionModal">
-  Crear Atención con Texto No Estructurado
+<h1 class="mb-4">Lista de Atenciones</h1>
+<!-- Botón para abrir el modal de creación de atención -->
+<button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#crearAtencionModal">
+  <i class="bi bi-plus-circle"></i> Nueva Atención
 </button>
-
 <!-- Modal para Ingreso de Texto No Estructurado -->
 <div class="modal fade" id="crearAtencionModal" tabindex="-1" aria-labelledby="crearAtencionModalLabel"
   aria-hidden="true">
@@ -20,69 +18,77 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          {{ macros.render_form_field(form_datos_inicio_paciente.datos_inicio_paciente_raw_text, attrs={'id':
-          'textoNoEstructurado', 'rows': 5,
-          'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'}) }}
+          {{ macros.render_form_field(
+          form_datos_inicio_paciente.datos_inicio_paciente_raw_text,
+          attrs={
+          'id': 'textoNoEstructurado',
+          'rows': 5,
+          'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'
+          }
+          ) }}
           <div id="crearAtencionError" class="text-danger mt-2 d-none"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" class="btn btn-primary" id="enviarTextoNoEstructurado">Enviar</button>
+          <button type="button" class="btn btn-primary" id="enviarTextoNoEstructurado">
+            <i class="bi bi-send"></i> Enviar
+          </button>
         </div>
       </form>
     </div>
   </div>
 </div>
-
-<table class="table table-bordered">
-  <thead class="table-light">
-    <tr>
-      <th>Tiempo (hh:mm)</th>
-      <th>RUN</th>
-      <th>Nombre</th>
-      <th>Edad</th>
-      <th>Motivo</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for atencion in atenciones %}
-    <tr>
-      <td>{{ atencion.tiempo_desde_creacion }}</td>
-      <td>{{ atencion.paciente.run }}</td>
-      <td>{{ atencion.paciente.nombre or 'N/A' }}</td>
-      <td>
-        {% if atencion.paciente.edad %}
-        {{ atencion.paciente.edad }} años
-        {% else %}
-        N/A
-        {% endif %}
-      </td>
-      <td>
-        <span data-bs-toggle="tooltip" title="{{ atencion.detalle }}">
-          {{ atencion.obtener_sintesis(40) }}
-        </span>
-      </td>
-      <td>
-        <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}"
-          class="btn btn-info btn-sm">Detalles</a>
-        <!-- Botón para abrir el modal de selección de reporte -->
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
-          data-bs-target="#seleccionarReporteModal" data-atencion-id="{{ atencion.id }}">
-          Reporte
-        </button>
-        <form action="{{ url_for('main.cierre_atencion_route', atencion_id=atencion.id) }}" method="POST"
-          style="display:inline;">
-          {{ form_cierre_atencion.hidden_tag() }}
-          {{ form_cierre_atencion.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de cerrar
-          esta
-          atención?');") }}
-        </form>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Tiempo (hh:mm)</th>
+        <th>RUN</th>
+        <th>Nombre</th>
+        <th>Edad</th>
+        <th>Motivo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for atencion in atenciones %}
+      <tr>
+        <td>{{ atencion.tiempo_desde_creacion }}</td>
+        <td>{{ atencion.paciente.run }}</td>
+        <td>{{ atencion.paciente.nombre or 'N/A' }}</td>
+        <td>
+          {% if atencion.paciente.edad %}
+          {{ atencion.paciente.edad }} años
+          {% else %}
+          N/A
+          {% endif %}
+        </td>
+        <td>
+          <span data-bs-toggle="tooltip" title="{{ atencion.detalle }}">
+            {{ atencion.obtener_sintesis(40) }}
+          </span>
+        </td>
+        <td>
+          <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" class="btn btn-info btn-sm">
+            <i class="bi bi-eye"></i> Detalles
+          </a>
+          <!-- Botón para abrir el modal de selección de reporte -->
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+            data-bs-target="#seleccionarReporteModal" data-atencion-id="{{ atencion.id }}">
+            <i class="bi bi-file-earmark-text"></i> Reporte
+          </button>
+          <form action="{{ url_for('main.cierre_atencion_route', atencion_id=atencion.id) }}" method="POST"
+            style="display:inline;">
+            {{ form_cierre_atencion.hidden_tag() }}
+            {{ form_cierre_atencion.submit(class="btn btn-danger btn-sm", onclick="return confirm('¿Está seguro de
+            cerrar esta atención?');", value='Cerrar') }}
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 <!-- Modal de Selección de Tipo de Reporte -->
 <div class="modal fade" id="seleccionarReporteModal" tabindex="-1" aria-labelledby="seleccionarReporteModalLabel"
   aria-hidden="true">
@@ -96,13 +102,19 @@
         <p>Seleccione el tipo de reporte que desea generar:</p>
         <ul class="list-group">
           <li class="list-group-item">
-            <a href="#" class="btn btn-link" data-report-type="alta_ambulatoria">Alta Ambulatoria</a>
+            <a href="#" class="btn btn-link" data-report-type="alta_ambulatoria">
+              Alta Ambulatoria
+            </a>
           </li>
           <li class="list-group-item">
-            <a href="#" class="btn btn-link" data-report-type="hospitalizacion">Hospitalización</a>
+            <a href="#" class="btn btn-link" data-report-type="hospitalizacion">
+              Hospitalización
+            </a>
           </li>
           <li class="list-group-item">
-            <a href="#" class="btn btn-link" data-report-type="interconsulta">Interconsulta</a>
+            <a href="#" class="btn btn-link" data-report-type="interconsulta">
+              Interconsulta
+            </a>
           </li>
         </ul>
       </div>
@@ -112,25 +124,27 @@
     </div>
   </div>
 </div>
-
 {% endblock %}
-
 
 {% block scripts %}
 <script>
+  // Inicializar tooltips
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+
   // Manejar el envío del formulario de Texto No Estructurado
   document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
     const texto = document.getElementById("textoNoEstructurado").value.trim();
     const errorDiv = document.getElementById("crearAtencionError");
     errorDiv.classList.add("d-none");
     errorDiv.textContent = "";
-
     if (!texto) {
       errorDiv.textContent = "El texto no puede estar vacío.";
       errorDiv.classList.remove("d-none");
       return;
     }
-
     fetch("{{ url_for('main.extraccion_datos_inicio_paciente_route') }}", {
       method: "POST",
       headers: {
@@ -138,7 +152,8 @@
         "X-CSRFToken": "{{ csrf_token() }}"
       },
       body: JSON.stringify({ texto })
-    }).then(response => response.json().then(data => ({ status: response.status, body: data })))
+    }).then(response => response.json()
+      .then(data => ({ status: response.status, body: data })))
       .then(result => {
         if (result.status === 200) {
           window.location.reload();
@@ -160,7 +175,6 @@
     var button = event.relatedTarget;
     currentAtencionId = button.getAttribute('data-atencion-id');
   });
-
   var reportLinks = seleccionarReporteModal.querySelectorAll('[data-report-type]');
   reportLinks.forEach(function (link) {
     link.addEventListener('click', function (e) {

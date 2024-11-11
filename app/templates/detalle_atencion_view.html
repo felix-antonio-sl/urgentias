@@ -1,82 +1,107 @@
 {% extends "base.html" %}
 {% import 'macros.html' as macros %}
-
 {% block title %}Detalle de Atención{% endblock %}
-
 {% block content %}
 <div class="container mt-4">
-  <h2 class="mb-4">Atención Actual</h2>
-
-  <div class="row mb-3">
-    <div class="col-md-4"><strong>RUT:</strong> {{ paciente.run }}</div>
-    <div class="col-md-4"><strong>Nombre:</strong> {{ paciente.nombre or 'N/A' }}</div>
-    <div class="col-md-4"><strong>Edad:</strong>
-      {% if paciente.edad %}
-      {{ paciente.edad }} años
-      {% else %}
-      N/A
-      {% endif %}
+  <h1 class="mb-5">Atención Actual</h1>
+  <div class="row mb-5">
+    <div class="col-md-4">
+      <h5>RUN</h5>
+      <p>{{ paciente.run }}</p>
+    </div>
+    <div class="col-md-4">
+      <h5>Nombre</h5>
+      <p>{{ paciente.nombre or 'N/A' }}</p>
+    </div>
+    <div class="col-md-4">
+      <h5>Edad</h5>
+      <p>
+        {% if paciente.edad %}
+        {{ paciente.edad }} años
+        {% else %}
+        N/A
+        {% endif %}
+      </p>
     </div>
   </div>
-
-  <div class="row">
-    <!-- Columna de Actualizar Historia Clínica -->
-    <div class="col-md-6">
-      <h4>Historia Clínica</h4>
+  <!-- Pestañas -->
+  <ul class="nav nav-tabs mb-4" id="detalleAtencionTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="historia-tab" data-bs-toggle="tab" data-bs-target="#historia" type="button"
+        role="tab" aria-controls="historia" aria-selected="true">Historia Clínica</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="atencion-tab" data-bs-toggle="tab" data-bs-target="#atencion" type="button"
+        role="tab" aria-controls="atencion" aria-selected="false">Atención Actual</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button" role="tab"
+        aria-controls="ai" aria-selected="false">Asistencia AI</button>
+    </li>
+  </ul>
+  <div class="tab-content" id="detalleAtencionTabsContent">
+    <!-- Historia Clínica -->
+    <div class="tab-pane fade show active" id="historia" role="tabpanel" aria-labelledby="historia-tab">
       <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
         {{ form_historia_medica.hidden_tag() }}
-        {{ macros.render_form_field(form_historia_medica.historia_medica_text, attrs={'rows': 10, 'id':
-        'historiaClinica'}) }}
+        {{ macros.render_form_field(
+        form_historia_medica.historia_medica_text,
+        attrs={'id': 'historiaClinica', 'rows': 10}
+        ) }}
         <div class="d-flex">
           {{ form_historia_medica.submit(class="btn btn-primary me-2") }}
           <!-- Botón para abrir el modal de Historia en Bruto -->
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
-            Procesar
+            <i class="bi bi-arrow-repeat"></i> Procesar
           </button>
         </div>
       </form>
     </div>
-
-    <!-- Columna de Actualizar Detalle de Atención Actual -->
-    <div class="col-md-6">
-      <h4>Atención Actual</h4>
+    <!-- Atención Actual -->
+    <div class="tab-pane fade" id="atencion" role="tabpanel" aria-labelledby="atencion-tab">
       <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
         {{ form_progreso_atencion.hidden_tag() }}
-        {{ macros.render_form_field(form_progreso_atencion.progreso_atencion_text, attrs={'rows': 10, 'id':
-        'detalleAtencion'}) }}
+        {{ macros.render_form_field(
+        form_progreso_atencion.progreso_atencion_text,
+        attrs={'id': 'detalleAtencion', 'rows': 10}
+        ) }}
         <div class="d-flex">
           {{ form_progreso_atencion.submit(class="btn btn-primary me-2") }}
           <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
-            Procesar
+            <i class="bi bi-arrow-repeat"></i> Procesar
           </button>
         </div>
       </form>
     </div>
+    <!-- Asistencia AI -->
+    <div class="tab-pane fade" id="ai" role="tabpanel" aria-labelledby="ai-tab">
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h4>Diagnóstico Diferencial</h4>
+          <p>{{ atencion.diagnostico_diferencial or "Información no disponible" }}</p>
+        </div>
+        <div class="col-md-6">
+          <h4>Manejo Sugerido</h4>
+          <p>{{ atencion.manejo_sugerido or "Información no disponible" }}</p>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h4>Próxima Acción Más Importante</h4>
+          <p class="text-highlight">
+            {{ atencion.proxima_accion or "Información no disponible" }}
+          </p>
+        </div>
+        <div class="col-md-6">
+          <h4>Alertas de Amenazas o Riesgos</h4>
+          <p class="text-danger">
+            {{ atencion.alertas or "Información no disponible" }}
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <!-- Secciones de Información Generada por AI -->
-  <div class="row mt-4">
-    <div class="col-md-6">
-      <h4>Diagnóstico Diferencial</h4>
-      <p>{{ atencion.diagnostico_diferencial or "Información no disponible" }}</p>
-    </div>
-    <div class="col-md-6">
-      <h4>Manejo Sugerido</h4>
-      <p>{{ atencion.manejo_sugerido or "Información no disponible" }}</p>
-    </div>
-  </div>
-  <div class="row mt-4">
-    <div class="col-md-6">
-      <h4>Próxima Acción Más Importante</h4>
-      <p class="text-highlight">{{ atencion.proxima_accion or "Información no disponible" }}</p>
-    </div>
-    <div class="col-md-6">
-      <h4>Alertas de Amenazas o Riesgos</h4>
-      <p class="text-danger">{{ atencion.alertas or "Información no disponible" }}</p>
-    </div>
-  </div>
-
   <!-- Modales -->
   <!-- Modal de Historia en Bruto -->
   <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel"
@@ -90,9 +115,10 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
-            {{ macros.render_form_field(form_nuevos_antecedentes.nuevos_antecedentes_raw_text, attrs={'id':
-            'historiaBruto', 'rows': 5})
-            }}
+            {{ macros.render_form_field(
+            form_nuevos_antecedentes.nuevos_antecedentes_raw_text,
+            attrs={'id': 'historiaBruto', 'rows': 5}
+            ) }}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -102,7 +128,6 @@
       </div>
     </div>
   </div>
-
   <!-- Modal de Detalle de Atención en Bruto -->
   <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel"
     aria-hidden="true">
@@ -115,8 +140,10 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
-            {{ macros.render_form_field(form_novedades_atencion.novedades_atencion_raw_text, attrs={'id':
-            'detalleBruto', 'rows': 5}) }}
+            {{ macros.render_form_field(
+            form_novedades_atencion.novedades_atencion_raw_text,
+            attrs={'id': 'detalleBruto', 'rows': 5}
+            ) }}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -126,46 +153,19 @@
       </div>
     </div>
   </div>
-
 </div>
 {% endblock %}
 
-
 {% block scripts %}
 <script>
-  // Manejar el envío del formulario de Texto No Estructurado
-  document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
-    const texto = document.getElementById("textoNoEstructurado").value.trim();
-    const errorDiv = document.getElementById("crearAtencionError");
-    errorDiv.style.display = "none";
-    errorDiv.textContent = "";
-
-    if (!texto) {
-      errorDiv.textContent = "El texto no puede estar vacío.";
-      errorDiv.style.display = "block";
-      return;
-    }
-
-    fetch("{{ url_for('main.extraccion_datos_inicio_paciente_route') }}", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token() }}"
-      },
-      body: JSON.stringify({ texto })
-    }).then(response => response.json().then(data => ({ status: response.status, body: data })))
-      .then(result => {
-        if (result.status === 200) {
-          window.location.reload();
-        } else {
-          errorDiv.textContent = result.body.error || "Error al procesar el texto.";
-          errorDiv.style.display = "block";
-        }
-      })
-      .catch(() => {
-        errorDiv.textContent = "Error de comunicación con el servidor.";
-        errorDiv.style.display = "block";
-      });
-  });
+  // Inicializar pestañas
+  var triggerTabList = [].slice.call(document.querySelectorAll('#detalleAtencionTabs button'))
+  triggerTabList.forEach(function (triggerEl) {
+    var tabTrigger = new bootstrap.Tab(triggerEl)
+    triggerEl.addEventListener('click', function (event) {
+      event.preventDefault()
+      tabTrigger.show()
+    })
+  })
 </script>
 {% endblock %}

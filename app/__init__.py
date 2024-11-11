@@ -1,3 +1,4 @@
+# app/__init__.py
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -9,6 +10,7 @@ import ell
 from flask_wtf import CSRFProtect
 from flask_login import LoginManager
 from markupsafe import Markup, escape
+from datetime import datetime, timezone
 
 
 # Definición del filtro nl2br
@@ -83,5 +85,9 @@ def create_app(config_class=DevelopmentConfig):
 
         app.logger.setLevel(logging.INFO)
         app.logger.info("Urgentias startup")
+
+    @app.context_processor
+    def inject_current_year():
+        return {"current_year": datetime.now(timezone.utc).year}
 
     return app

@@ -11,13 +11,17 @@
   <p><strong>Edad:</strong> {{ atencion.paciente.edad }} años</p>
 
   <h3>Reporte</h3>
-  <p>{{ reporte | nl2br }}</p>
+  <div class="bg-light p-3 rounded">
+    <p>{{ reporte | nl2br }}</p>
+  </div>
 
-  <p>
-    <a href="{{ url_for('main.lista_atenciones_route') }}" class="btn btn-primary">Volver a la Lista de Atenciones</a>
-    <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" class="btn btn-secondary">Volver a
-      Detalle
-      de Atención</a>
-  </p>
+  <div class="mt-4">
+    <a href="{{ url_for('main.lista_atenciones_route') }}" class="btn btn-secondary me-2">
+      <i class="bi bi-arrow-left"></i> Volver a la Lista de Atenciones
+    </a>
+    <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" class="btn btn-primary">
+      <i class="bi bi-eye"></i> Ver Detalle de Atención
+    </a>
+  </div>
 </div>
 {% endblock %}

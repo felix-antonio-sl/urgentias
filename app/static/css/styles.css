@@ -1,33 +1,195 @@
 /* Estilos personalizados para Urgentias */
 
-/* Variables de colores personalizados */
+/* Sobrescribir variables de Bootstrap */
 :root {
-    --primary-color: #00B2A9;
-    /* Teal */
-    --secondary-color: #4B0082;
-    /* Indigo */
-    --accent-color: #FFD700;
-    /* Gold */
-    --highlight-color: #C71585;
-    /* Medium Violet Red */
+  --bs-body-bg: #ffffff;
+  --bs-body-color: #000000;
+  --bs-primary: #3D0066; /* Morado oscuro */
+  --bs-secondary: #00B2A9; /* Turquesa */
+  --bs-success: #00B2A9;
+  --bs-danger: #C71585; /* Rosa intenso */
+  --bs-warning: #FDC500; /* Amarillo */
+  --bs-info: #3D0066;
+  --bs-light: #f8f9fa;
+  --bs-dark: #000000;
+  --bs-link-color: #3D0066;
 
-    /* Sobrescribir variables de Bootstrap */
-    --bs-primary: var(--primary-color);
-    --bs-secondary: var(--secondary-color);
-    --bs-success: var(--accent-color);
-    --bs-danger: var(--highlight-color);
-    /* Puedes continuar sobrescribiendo otras variables según sea necesario */
+  /* Tipografía */
+  --bs-font-sans-serif: 'Roboto', sans-serif;
+  --bs-font-size-base: 1rem;
+  --bs-font-size-lg: 1.25rem;
+  --bs-font-size-sm: 0.875rem;
+  --bs-heading-font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: var(--bs-font-sans-serif);
+  font-size: var(--bs-font-size-base);
+  line-height: 1.6;
+  color: var(--bs-body-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--bs-heading-font-family);
+  font-weight: 700;
+  color: var(--bs-primary);
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+.container {
+  max-width: 960px;
+}
+
+.navbar-brand,
+.nav-link {
+  font-family: var(--bs-heading-font-family);
+  font-weight: 600;
+}
+
+.btn {
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0;
+}
+
+.table {
+  margin-bottom: 2rem;
+}
+
+.table th {
+  font-weight: 700;
+  color: var(--bs-primary);
+}
+
+.form-control {
+  padding: 0.75rem 1rem;
+  border-radius: 0;
+}
+
+.form-control:focus {
+  border-color: var(--bs-primary);
+  box-shadow: none;
+}
+
+.footer {
+  background-color: #ffffff; /* Fondo blanco */
+  color: #000000;            /* Texto negro */
+  padding: 2rem 0;
+  border-top: 1px solid #eaeaea; /* Línea superior suave */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.footer p {
+  margin: 0;
+  font-size: 1rem; /* Asegura legibilidad */
+  font-weight: 400; /* Peso de fuente regular */
+}
+
+/* Espaciado adicional */
+.mt-4 {
+  margin-top: 2rem !important;
+}
+
+.mb-4 {
+  margin-bottom: 2rem !important;
+}
+
+.pt-4 {
+  padding-top: 2rem !important;
+}
+
+.pb-4 {
+  padding-bottom: 2rem !important;
 }
 
 /* Estilos para resaltar información AI */
 .text-highlight {
-    background-color: #ffffcc;
-    /* Amarillo claro */
-    font-weight: bold;
+  background-color: #FDC500;
+  font-weight: bold;
+  color: #000000;
 }
 
 .text-danger {
-    color: var(--bs-danger);
-    /* Usando el color definido */
-    font-weight: bold;
+  color: var(--bs-danger);
+  font-weight: bold;
+}
+
+/* Estilos para los formularios */
+.form-label {
+  font-weight: 600;
+}
+
+.modal-content {
+  border-radius: 0;
+}
+
+.modal-header {
+  background-color: var(--bs-primary);
+  color: #ffffff;
+}
+
+.modal-footer {
+  border-top: none;
+}
+
+/* Mejorar la legibilidad de los encabezados */
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 1.2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Aumentar el espacio entre párrafos y secciones */
+section {
+  padding: 2rem 0;
+}
+
+/* Mejorar la apariencia de los formularios */
+.form-control {
+  font-size: 1rem;
+}
+
+.form-label {
+  margin-bottom: 0.5rem;
+}
+
+/* Ajustar botones para mayor claridad */
+.btn {
+  font-size: 1rem;
+}
+
+/* Espaciado en tablas */
+.table th,
+.table td {
+  padding: 1rem;
+}
+
+/* Mejorar el aspecto de los modales */
+.modal-header h5 {
+  font-size: 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1rem;
 }
