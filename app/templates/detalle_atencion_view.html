@@ -6,15 +6,15 @@
   <h1 class="mb-5">Atención Actual</h1>
   <div class="row mb-5">
     <div class="col-md-4">
-      <h5>RUN</h5>
+      <h4>RUN</h4>
       <p>{{ paciente.run }}</p>
     </div>
     <div class="col-md-4">
-      <h5>Nombre</h5>
+      <h4>Nombre</h4>
       <p>{{ paciente.nombre or 'N/A' }}</p>
     </div>
     <div class="col-md-4">
-      <h5>Edad</h5>
+      <h4>Edad</h4>
       <p>
         {% if paciente.edad %}
         {{ paciente.edad }} años
@@ -45,8 +45,8 @@
       <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
         {{ form_historia_medica.hidden_tag() }}
         {{ macros.render_form_field(
-        form_historia_medica.historia_medica_text,
-        attrs={'id': 'historiaClinica', 'rows': 10}
+          form_historia_medica.historia_medica_text,
+          attrs={'id': 'historiaClinica', 'rows': 10}
         ) }}
         <div class="d-flex">
           {{ form_historia_medica.submit(class="btn btn-primary me-2") }}
@@ -62,8 +62,8 @@
       <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
         {{ form_progreso_atencion.hidden_tag() }}
         {{ macros.render_form_field(
-        form_progreso_atencion.progreso_atencion_text,
-        attrs={'id': 'detalleAtencion', 'rows': 10}
+          form_progreso_atencion.progreso_atencion_text,
+          attrs={'id': 'detalleAtencion', 'rows': 10}
         ) }}
         <div class="d-flex">
           {{ form_progreso_atencion.submit(class="btn btn-primary me-2") }}
@@ -116,8 +116,8 @@
           </div>
           <div class="modal-body">
             {{ macros.render_form_field(
-            form_nuevos_antecedentes.nuevos_antecedentes_raw_text,
-            attrs={'id': 'historiaBruto', 'rows': 5}
+              form_nuevos_antecedentes.nuevos_antecedentes_raw_text,
+              attrs={'id': 'historiaBruto', 'rows': 5}
             ) }}
           </div>
           <div class="modal-footer">
@@ -141,8 +141,8 @@
           </div>
           <div class="modal-body">
             {{ macros.render_form_field(
-            form_novedades_atencion.novedades_atencion_raw_text,
-            attrs={'id': 'detalleBruto', 'rows': 5}
+              form_novedades_atencion.novedades_atencion_raw_text,
+              attrs={'id': 'detalleBruto', 'rows': 5}
             ) }}
           </div>
           <div class="modal-footer">

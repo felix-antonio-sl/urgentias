@@ -492,29 +492,197 @@ def extraer_json(respuesta):
 
 /* Sobrescribir variables de Bootstrap */
 :root {
-    --bs-primary: #00B2A9;
-    /* Teal */
-    --bs-secondary: #4B0082;
-    /* Indigo */
-    --bs-success: #28a745;
-    /* Puedes ajustarlo si lo deseas */
-    --bs-danger: #dc3545;
-    /* Puedes ajustarlo si lo deseas */
+  --bs-body-bg: #ffffff;
+  --bs-body-color: #000000;
+  --bs-primary: #3D0066; /* Morado oscuro */
+  --bs-secondary: #00B2A9; /* Turquesa */
+  --bs-success: #00B2A9;
+  --bs-danger: #C71585; /* Rosa intenso */
+  --bs-warning: #FDC500; /* Amarillo */
+  --bs-info: #3D0066;
+  --bs-light: #f8f9fa;
+  --bs-dark: #000000;
+  --bs-link-color: #3D0066;
+
+  /* Tipografía */
+  --bs-font-sans-serif: 'Roboto', sans-serif;
+  --bs-font-size-base: 1rem;
+  --bs-font-size-lg: 1.25rem;
+  --bs-font-size-sm: 0.875rem;
+  --bs-heading-font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: var(--bs-font-sans-serif);
+  font-size: var(--bs-font-size-base);
+  line-height: 1.6;
+  color: var(--bs-body-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--bs-heading-font-family);
+  font-weight: 700;
+  color: var(--bs-primary);
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+.container {
+  max-width: 960px;
+}
+
+.navbar-brand,
+.nav-link {
+  font-family: var(--bs-heading-font-family);
+  font-weight: 600;
+}
+
+.btn {
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0;
+}
+
+.table {
+  margin-bottom: 2rem;
+}
+
+.table th {
+  font-weight: 700;
+  color: var(--bs-primary);
+}
+
+.form-control {
+  padding: 0.75rem 1rem;
+  border-radius: 0;
+}
+
+.form-control:focus {
+  border-color: var(--bs-primary);
+  box-shadow: none;
+}
+
+.footer {
+  background-color: #ffffff; /* Fondo blanco */
+  color: #000000;            /* Texto negro */
+  padding: 2rem 0;
+  border-top: 1px solid #eaeaea; /* Línea superior suave */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.footer p {
+  margin: 0;
+  font-size: 1rem; /* Asegura legibilidad */
+  font-weight: 400; /* Peso de fuente regular */
+}
+
+/* Espaciado adicional */
+.mt-4 {
+  margin-top: 2rem !important;
+}
+
+.mb-4 {
+  margin-bottom: 2rem !important;
+}
+
+.pt-4 {
+  padding-top: 2rem !important;
+}
+
+.pb-4 {
+  padding-bottom: 2rem !important;
 }
 
 /* Estilos para resaltar información AI */
 .text-highlight {
-    background-color: #ffffcc;
-    /* Amarillo claro */
-    font-weight: bold;
+  background-color: #FDC500;
+  font-weight: bold;
+  color: #000000;
 }
 
 .text-danger {
-    color: var(--bs-danger);
-    font-weight: bold;
+  color: var(--bs-danger);
+  font-weight: bold;
 }
 
-/* Si necesitas estilos adicionales, agrégalos aquí */
+/* Estilos para los formularios */
+.form-label {
+  font-weight: 600;
+}
+
+.modal-content {
+  border-radius: 0;
+}
+
+.modal-header {
+  background-color: var(--bs-primary);
+  color: #ffffff;
+}
+
+.modal-footer {
+  border-top: none;
+}
+
+/* Mejorar la legibilidad de los encabezados */
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 1.2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Aumentar el espacio entre párrafos y secciones */
+section {
+  padding: 2rem 0;
+}
+
+/* Mejorar la apariencia de los formularios */
+.form-control {
+  font-size: 1rem;
+}
+
+.form-label {
+  margin-bottom: 0.5rem;
+}
+
+/* Ajustar botones para mayor claridad */
+.btn {
+  font-size: 1rem;
+}
+
+/* Espaciado en tablas */
+.table th,
+.table td {
+  padding: 1rem;
+}
+
+/* Mejorar el aspecto de los modales */
+.modal-header h5 {
+  font-size: 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1rem;
+}
 ```
 
 ### 404.html
@@ -558,10 +726,18 @@ def extraer_json(respuesta):
   <meta charset="utf-8">
   <title>{% block title %}Urgentias{% endblock %}</title>
   {% import 'macros.html' as macros %}
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
   <!-- CSS Personalizado -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
@@ -575,6 +751,7 @@ def extraer_json(respuesta):
     {% block content %}{% endblock %}
   </main>
   {% include 'footer.html' %}
+  
   <!-- Bootstrap JS y dependencias -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   {% block scripts %}{% endblock %}
@@ -591,20 +768,29 @@ def extraer_json(respuesta):
 {% block title %}Detalle de Atención{% endblock %}
 {% block content %}
 <div class="container mt-4">
-  <h2 class="mb-4">Atención Actual</h2>
-  <div class="row mb-3">
-    <div class="col-md-4"><strong>RUT:</strong> {{ paciente.run }}</div>
-    <div class="col-md-4"><strong>Nombre:</strong> {{ paciente.nombre or 'N/A' }}</div>
-    <div class="col-md-4"><strong>Edad:</strong>
-      {% if paciente.edad %}
-      {{ paciente.edad }} años
-      {% else %}
-      N/A
-      {% endif %}
+  <h1 class="mb-5">Atención Actual</h1>
+  <div class="row mb-5">
+    <div class="col-md-4">
+      <h5>RUN</h5>
+      <p>{{ paciente.run }}</p>
+    </div>
+    <div class="col-md-4">
+      <h5>Nombre</h5>
+      <p>{{ paciente.nombre or 'N/A' }}</p>
+    </div>
+    <div class="col-md-4">
+      <h5>Edad</h5>
+      <p>
+        {% if paciente.edad %}
+        {{ paciente.edad }} años
+        {% else %}
+        N/A
+        {% endif %}
+      </p>
     </div>
   </div>
   <!-- Pestañas -->
-  <ul class="nav nav-tabs" id="detalleAtencionTabs" role="tablist">
+  <ul class="nav nav-tabs mb-4" id="detalleAtencionTabs" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="historia-tab" data-bs-toggle="tab" data-bs-target="#historia" type="button"
         role="tab" aria-controls="historia" aria-selected="true">Historia Clínica</button>
@@ -631,7 +817,7 @@ def extraer_json(respuesta):
           {{ form_historia_medica.submit(class="btn btn-primary me-2") }}
           <!-- Botón para abrir el modal de Historia en Bruto -->
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
-            <i class="bi bi-process"></i> Procesar
+            <i class="bi bi-arrow-repeat"></i> Procesar
           </button>
         </div>
       </form>
@@ -648,7 +834,7 @@ def extraer_json(respuesta):
           {{ form_progreso_atencion.submit(class="btn btn-primary me-2") }}
           <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
-            <i class="bi bi-process"></i> Procesar
+            <i class="bi bi-arrow-repeat"></i> Procesar
           </button>
         </div>
       </form>
@@ -737,12 +923,6 @@ def extraer_json(respuesta):
 
 {% block scripts %}
 <script>
-  // Inicializar tooltips
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
-
   // Inicializar pestañas
   var triggerTabList = [].slice.call(document.querySelectorAll('#detalleAtencionTabs button'))
   triggerTabList.forEach(function (triggerEl) {
@@ -752,62 +932,6 @@ def extraer_json(respuesta):
       tabTrigger.show()
     })
   })
-
-  // Manejar el envío del formulario de Texto No Estructurado
-  document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
-    const texto = document.getElementById("textoNoEstructurado").value.trim();
-    const errorDiv = document.getElementById("crearAtencionError");
-    errorDiv.classList.add("d-none");
-    errorDiv.textContent = "";
-    if (!texto) {
-      errorDiv.textContent = "El texto no puede estar vacío.";
-      errorDiv.classList.remove("d-none");
-      return;
-    }
-    fetch("{{ url_for('main.extraccion_datos_inicio_paciente_route') }}", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token() }}"
-      },
-      body: JSON.stringify({ texto })
-    }).then(response => response.json()
-      .then(data => ({ status: response.status, body: data })))
-      .then(result => {
-        if (result.status === 200) {
-          window.location.reload();
-        } else {
-          errorDiv.textContent = result.body.error || "Error al procesar el texto.";
-          errorDiv.classList.remove("d-none");
-        }
-      })
-      .catch(() => {
-        errorDiv.textContent = "Error de comunicación con el servidor.";
-        errorDiv.classList.remove("d-none");
-      });
-  });
-
-  // Script para seleccionar el tipo de reporte y generar la URL
-  let currentAtencionId = null;
-  var seleccionarReporteModal = document.getElementById('seleccionarReporteModal');
-  seleccionarReporteModal.addEventListener('show.bs.modal', function (event) {
-    var button = event.relatedTarget;
-    currentAtencionId = button.getAttribute('data-atencion-id');
-  });
-  var reportLinks = seleccionarReporteModal.querySelectorAll('[data-report-type]');
-  reportLinks.forEach(function (link) {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (!currentAtencionId) {
-        alert('Error: No se pudo obtener el ID de la atención.');
-        return;
-      }
-      var tipoReporte = this.getAttribute('data-report-type');
-      var url = "{{ url_for('main.generacion_reporte_route', atencion_id='ATENCION_ID', tipo_reporte='TIPO_REPORTE') }}";
-      url = url.replace('ATENCION_ID', currentAtencionId).replace('TIPO_REPORTE', tipoReporte);
-      window.location.href = url;
-    });
-  });
 </script>
 {% endblock %}
 ```
@@ -815,9 +939,9 @@ def extraer_json(respuesta):
 ### footer.html
 
 ```html
-<footer class="py-3 bg-primary">
-  <div class="container text-center text-white">
-    <p class="mb-0">&copy; {{ current_year }} Urgentias</p>
+<footer class="footer text-center">
+  <div class="container">
+    <p>&copy; {{ current_year }} Urgentias</p>
   </div>
 </footer>
 ```
@@ -829,10 +953,10 @@ def extraer_json(respuesta):
 {% import 'macros.html' as macros %}
 {% block title %}Lista de Atenciones{% endblock %}
 {% block content %}
-<h2 class="mb-4">Lista de Atenciones</h2>
+<h1 class="mb-4">Lista de Atenciones</h1>
 <!-- Botón para abrir el modal de creación de atención -->
-<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearAtencionModal">
-  <i class="bi bi-plus-circle"></i> Crear Atención con Texto No Estructurado
+<button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#crearAtencionModal">
+  <i class="bi bi-plus-circle"></i> Nueva Atención
 </button>
 <!-- Modal para Ingreso de Texto No Estructurado -->
 <div class="modal fade" id="crearAtencionModal" tabindex="-1" aria-labelledby="crearAtencionModalLabel"
@@ -869,7 +993,7 @@ def extraer_json(respuesta):
   <table class="table table-hover align-middle">
     <thead class="table-light">
       <tr>
-        <th>Tiempo (hh:mm)</th>
+        <th>Tiempo</th>
         <th>RUN</th>
         <th>Nombre</th>
         <th>Edad</th>
@@ -1040,8 +1164,7 @@ def extraer_json(respuesta):
           {{ form.submit(class="btn btn-primary w-100") }}
         </div>
       </form>
-      <p class="mt-3 text-center">¿No tienes una cuenta? <a href="{{ url_for('auth.register') }}">Regístrate aquí</a>.
-      </p>
+      <p class="mt-3 text-center">¿No tienes una cuenta? <a href="{{ url_for('auth.register') }}">Regístrate aquí</a>.</p>
     </div>
   </div>
 </div>
@@ -1091,7 +1214,7 @@ def extraer_json(respuesta):
 ### navbar.html
 
 ```html
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url_for('main.lista_atenciones_route') }}">
             <i class="bi bi-house-door-fill"></i> Urgentias
@@ -1155,8 +1278,7 @@ def extraer_json(respuesta):
           {{ form.submit(class="btn btn-primary w-100") }}
         </div>
       </form>
-      <p class="mt-3 text-center">¿Ya tienes una cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión aquí</a>.
-      </p>
+      <p class="mt-3 text-center">¿Ya tienes una cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión aquí</a>.</p>
     </div>
   </div>
 </div>
@@ -1179,14 +1301,18 @@ def extraer_json(respuesta):
   <p><strong>Edad:</strong> {{ atencion.paciente.edad }} años</p>
 
   <h3>Reporte</h3>
-  <p>{{ reporte | nl2br }}</p>
+  <div class="bg-light p-3 rounded">
+    <p>{{ reporte | nl2br }}</p>
+  </div>
 
-  <p>
-    <a href="{{ url_for('main.lista_atenciones_route') }}" class="btn btn-primary">Volver a la Lista de Atenciones</a>
-    <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" class="btn btn-secondary">Volver a
-      Detalle
-      de Atención</a>
-  </p>
+  <div class="mt-4">
+    <a href="{{ url_for('main.lista_atenciones_route') }}" class="btn btn-secondary me-2">
+      <i class="bi bi-arrow-left"></i> Volver a la Lista de Atenciones
+    </a>
+    <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" class="btn btn-primary">
+      <i class="bi bi-eye"></i> Ver Detalle de Atención
+    </a>
+  </div>
 </div>
 {% endblock %}
 ```

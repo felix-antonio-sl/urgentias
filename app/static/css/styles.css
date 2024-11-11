@@ -3,16 +3,16 @@
 /* Sobrescribir variables de Bootstrap */
 :root {
   --bs-body-bg: #ffffff;
-  --bs-body-color: #000000;
-  --bs-primary: #3D0066; /* Morado oscuro */
-  --bs-secondary: #00B2A9; /* Turquesa */
-  --bs-success: #00B2A9;
-  --bs-danger: #C71585; /* Rosa intenso */
-  --bs-warning: #FDC500; /* Amarillo */
-  --bs-info: #3D0066;
+  --bs-body-color: #333333; /* Texto en gris oscuro para mejor legibilidad */
+  --bs-primary: #C71585; /* Color estrella */
+  --bs-secondary: #6c757d;
+  --bs-success: #28a745;
+  --bs-danger: #dc3545;
+  --bs-warning: #ffc107;
+  --bs-info: #17a2b8;
   --bs-light: #f8f9fa;
-  --bs-dark: #000000;
-  --bs-link-color: #3D0066;
+  --bs-dark: #343a40;
+  --bs-link-color: #C71585;
 
   /* Tipografía */
   --bs-font-sans-serif: 'Roboto', sans-serif;
@@ -22,56 +22,150 @@
   --bs-heading-font-family: 'Montserrat', sans-serif;
 }
 
+/* Tipografía */
 body {
-  font-family: var(--bs-font-sans-serif);
-  font-size: var(--bs-font-size-base);
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--bs-heading-font-family);
+h1, .h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: var(--bs-primary);
+  color: var(--bs-primary); /* Color estrella para títulos principales */
+  margin-bottom: 1.2rem;
 }
 
-p {
+h2, .h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--bs-primary);
   margin-bottom: 1rem;
 }
 
-.container {
-  max-width: 960px;
-}
-
-.navbar-brand,
-.nav-link {
-  font-family: var(--bs-heading-font-family);
-  font-weight: 600;
-}
-
-.btn {
-  font-weight: 600;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0;
-}
-
-.table {
-  margin-bottom: 2rem;
-}
-
-.table th {
-  font-weight: 700;
+h3, .h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 500;
   color: var(--bs-primary);
+  margin-bottom: 0.8rem;
+}
+
+h4, .h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 0.6rem;
+}
+
+h5, .h5 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 0.4rem;
+}
+
+h6, .h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 0.2rem;
+}
+
+p {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  color: #555555; /* Texto de párrafo en gris medio */
+}
+
+a {
+  color: var(--bs-link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: #a70e6d;
+  text-decoration: underline;
+}
+
+/* Estilos para botones */
+.btn {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 12px; /* Bordes más redondeados */
+}
+
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+  background-color: #a70e6d;
+  border-color: #a70e6d;
+}
+
+.btn-secondary {
+  background-color: var(--bs-secondary);
+  border-color: var(--bs-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+.btn-outline-primary {
+  color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  border-radius: 12px;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--bs-primary);
+  color: #ffffff;
+}
+
+.btn-outline-secondary {
+  color: var(--bs-secondary);
+  border-color: var(--bs-secondary);
+  border-radius: 12px;
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--bs-secondary);
+  color: #ffffff;
+}
+
+.btn-outline-danger {
+  color: var(--bs-danger);
+  border-color: var(--bs-danger);
+  border-radius: 12px;
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--bs-danger);
+  color: #ffffff;
+}
+
+/* Estilos para formularios */
+.form-label {
+  font-weight: 600;
+  color: #333333;
 }
 
 .form-control {
+  font-size: 1rem;
+  border-radius: 8px; /* Añadir bordes redondeados */
   padding: 0.75rem 1rem;
-  border-radius: 0;
 }
 
 .form-control:focus {
@@ -79,117 +173,171 @@ p {
   box-shadow: none;
 }
 
-.footer {
-  background-color: #ffffff; /* Fondo blanco */
-  color: #000000;            /* Texto negro */
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea; /* Línea superior suave */
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+/* Estilos para tablas */
+.table {
+  font-size: 0.95rem;
+  color: #333333;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px; /* Bordes redondeados */
+  overflow: hidden;
 }
 
-.footer p {
-  margin: 0;
-  font-size: 1rem; /* Asegura legibilidad */
-  font-weight: 400; /* Peso de fuente regular */
+.table th {
+  font-weight: 700;
+  background-color: #f8f9fa;
+  color: var(--bs-primary);
 }
 
-/* Espaciado adicional */
-.mt-4 {
-  margin-top: 2rem !important;
+.table td {
+  vertical-align: middle;
 }
 
-.mb-4 {
-  margin-bottom: 2rem !important;
+.table-responsive {
+  margin-bottom: 1.5rem;
 }
 
-.pt-4 {
-  padding-top: 2rem !important;
+/* Estilos para la barra de navegación */
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #eaeaea;
 }
 
-.pb-4 {
-  padding-bottom: 2rem !important;
+.navbar-brand {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--bs-primary);
+  font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+  font-weight: 500;
+  color: #333333;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--bs-primary);
 }
 
 /* Estilos para resaltar información AI */
 .text-highlight {
-  background-color: #FDC500;
-  font-weight: bold;
+  background-color: #ffc107;
+  font-weight: 600;
   color: #000000;
 }
 
 .text-danger {
   color: var(--bs-danger);
-  font-weight: bold;
-}
-
-/* Estilos para los formularios */
-.form-label {
   font-weight: 600;
 }
 
-.modal-content {
-  border-radius: 0;
+/* Bordes redondeados para tarjetas, modales y alertas */
+.card,
+.modal-content,
+.alert {
+  border-radius: 12px;
 }
 
-.modal-header {
-  background-color: var(--bs-primary);
-  color: #ffffff;
+/* Espaciado adicional */
+.mt-4, .my-4 {
+  margin-top: 1.5rem !important;
 }
 
-.modal-footer {
-  border-top: none;
+.mb-4, .my-4 {
+  margin-bottom: 1.5rem !important;
 }
 
-/* Mejorar la legibilidad de los encabezados */
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
+.pt-4 {
+  padding-top: 1.5rem !important;
 }
 
-h2 {
-  font-size: 2rem;
-  margin-bottom: 1.2rem;
+.pb-4 {
+  padding-bottom: 1.5rem !important;
 }
 
-h3 {
-  font-size: 1.75rem;
-  margin-bottom: 1rem;
-}
-
-/* Aumentar el espacio entre párrafos y secciones */
-section {
+/* Ajustar márgenes y paddings en secciones */
+.section {
   padding: 2rem 0;
 }
 
-/* Mejorar la apariencia de los formularios */
-.form-control {
-  font-size: 1rem;
+/* Ajustar enlaces */
+a {
+  color: var(--bs-link-color);
 }
 
-.form-label {
-  margin-bottom: 0.5rem;
+a:hover {
+  color: #a70e6d;
+  text-decoration: none;
 }
 
-/* Ajustar botones para mayor claridad */
-.btn {
-  font-size: 1rem;
+/* Ajustar estilos de alertas */
+.alert {
+  border-radius: 12px;
 }
 
-/* Espaciado en tablas */
-.table th,
-.table td {
-  padding: 1rem;
+.alert-dismissible .btn-close {
+  padding: 1.25rem 1rem;
 }
 
-/* Mejorar el aspecto de los modales */
-.modal-header h5 {
-  font-size: 1.5rem;
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
 }
 
-.modal-body {
-  padding: 1.5rem;
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
 }
 
-.modal-footer {
-  padding: 1rem;
+/* Mejorar legibilidad en dispositivos móviles */
+@media (max-width: 576px) {
+  h1, .h1 {
+    font-size: 2rem;
+  }
+  h2, .h2 {
+    font-size: 1.75rem;
+  }
+  h3, .h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Estilos para botones de acción discretos */
+.btn-action {
+  padding: 0.25rem 0.4rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+
+.btn-action-primary {
+  color: var(--bs-primary);
+  background-color: transparent;
+  border: none;
+}
+
+.btn-action-primary:hover {
+  color: #a70e6d;
+  background-color: transparent;
+}
+
+.btn-action-secondary {
+  color: var(--bs-secondary);
+  background-color: transparent;
+  border: none;
+}
+
+.btn-action-secondary:hover {
+  color: #5a6268;
+  background-color: transparent;
+}
+
+.btn-action-danger {
+  color: var(--bs-danger);
+  background-color: transparent;
+  border: none;
+}
+
+.btn-action-danger:hover {
+  color: #c82333;
+  background-color: transparent;
 }

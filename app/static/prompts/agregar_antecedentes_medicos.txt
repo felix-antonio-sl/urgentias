@@ -1,7 +1,9 @@
 Historia actual:
 {historia_conocida}
 
-Nuevo texto en bruto:
+Nuevo texto en bruto con nuevos antecedentes sobre la historia clinica:
 {nuevos_antecedentes}
 
 Por favor, genera una historia clínica actualizada y coherente.
+
+salida en texto plano bien estructurado y fluido.
