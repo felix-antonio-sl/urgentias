@@ -36,7 +36,7 @@
     </li>
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button" role="tab"
-        aria-controls="ai" aria-selected="false">Asistencia AI</button>
+        aria-controls="ai" aria-selected="false">AsistencIA</button>
     </li>
   </ul>
   <div class="tab-content" id="detalleAtencionTabsContent">
@@ -52,7 +52,7 @@
           {{ form_historia_medica.submit(class="btn btn-primary me-2") }}
           <!-- Botón para abrir el modal de Historia en Bruto -->
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
-            <i class="bi bi-arrow-repeat"></i> Procesar
+            <i class="bi bi-arrow-repeat"></i> Agregar Antecedentes
           </button>
         </div>
       </form>
@@ -69,7 +69,7 @@
           {{ form_progreso_atencion.submit(class="btn btn-primary me-2") }}
           <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
-            <i class="bi bi-arrow-repeat"></i> Procesar
+            <i class="bi bi-arrow-repeat"></i> Agregar Novedades
           </button>
         </div>
       </form>
@@ -111,7 +111,7 @@
         <form method="POST" action="{{ url_for('main.nuevos_antecedentes_route', atencion_id=atencion.id) }}">
           {{ form_nuevos_antecedentes.hidden_tag() }}
           <div class="modal-header">
-            <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Historia en Bruto</h5>
+            <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Antecedentes</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
@@ -136,7 +136,7 @@
         <form method="POST" action="{{ url_for('main.novedades_atencion_route', atencion_id=atencion.id) }}">
           {{ form_novedades_atencion.hidden_tag() }}
           <div class="modal-header">
-            <h5 class="modal-title" id="detalleBrutoModalLabel">Procesar Detalle de Atención en Bruto</h5>
+            <h5 class="modal-title" id="detalleBrutoModalLabel">Actualizar el progreso de la atención</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">

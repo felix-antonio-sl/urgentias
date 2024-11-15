@@ -24,7 +24,7 @@ class AsistenciaMedica(BaseModel):
     alertas: List[str] = Field(description="Lista de amenazas o riesgos identificados.")
 
 
-@ell.complex(model="gpt-4o-mini", response_format=AsistenciaMedica)
+@ell.complex(model="gpt-4o", response_format=AsistenciaMedica)
 def generar_asistencia_medica_ia(historia_conocida: str, atencion_en_curso: str):
     """Eres un médico de emergencias experto en diagnóstico y manejo clínico."""
     prompt_template = load_prompt("generar_asistencia_medica.txt")
@@ -36,7 +36,7 @@ def generar_asistencia_medica_ia(historia_conocida: str, atencion_en_curso: str)
     return [ell.user(prompt_content)]
 
 
-@ell.complex(model="gpt-4o-mini")
+@ell.complex(model="gpt-4o")
 def agregar_nuevos_antecedentes_ia(historia_conocida: str, nuevos_antecedentes: str):
     prompt_template = load_prompt("agregar_antecedentes_medicos.txt")
     prompt_content = prompt_template.format(
@@ -45,7 +45,7 @@ def agregar_nuevos_antecedentes_ia(historia_conocida: str, nuevos_antecedentes: 
     return [ell.user(prompt_content)]
 
 
-@ell.complex(model="gpt-4o-mini")
+@ell.complex(model="gpt-4o")
 def agregar_novedades_atencion_ia(
     historia_conocida: str, atencion_hasta_ahora: str, novedades_atencion: str
 ):
@@ -65,7 +65,7 @@ def extraer_datos_inicio_paciente_ia(datos_inicio_paciente: str):
     return [ell.user(prompt_content)]
 
 
-@ell.complex(model="gpt-4o-mini")
+@ell.complex(model="gpt-4o")
 def generar_reporte_atencion_ia(
     historia_conocida: str, atencion_en_curso: str, tipo_reporte: str
 ):
