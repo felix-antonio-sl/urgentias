@@ -1,0 +1,23 @@
+<div class="modal-box">
+    <form id="agregarAntecedentesForm" method="POST"
+        hx-post="{{ url_for('main.agregar_antecedentes_route', atencion_id=atencion.id) }}" hx-target="#tabContent"
+        hx-swap="innerHTML">
+        {{ form_nuevos_antecedentes.hidden_tag() }}
+        <h3 class="font-bold text-lg mb-4">Procesar Antecedentes</h3>
+        <div class="form-control">
+            <label class="label">
+                {{ form_nuevos_antecedentes.nuevos_antecedentes_raw_text.label(class="label-text") }}
+            </label>
+            {{ form_nuevos_antecedentes.nuevos_antecedentes_raw_text(class="textarea textarea-bordered", rows=5) }}
+            {% for error in form_nuevos_antecedentes.nuevos_antecedentes_raw_text.errors %}
+            <label class="label">
+                <span class="label-text-alt text-red-500">{{ error }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="modal-action">
+            <label for="reporteModal" class="btn btn-secondary">Cancelar</label>
+            {{ form_nuevos_antecedentes.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>

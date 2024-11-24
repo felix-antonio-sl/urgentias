@@ -1,359 +1,195 @@
-from flask import (
-    Blueprint,
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    request,
-    jsonify,
-    send_file,
-    current_app,
-)
-from .. import db
-from ..models import Paciente, Atencion
-from ..utils import (
-    agregar_nuevos_antecedentes_ia,
-    agregar_novedades_atencion_ia,
-    extraer_datos_inicio_paciente_ia,
-    generar_reporte_atencion_ia,  # Importación de la función consolidada
-    generar_asistencia_medica_ia,  # Importamos la nueva función unificada
-)
-from ..forms import (
+# app/routes/main.py
+
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask_login import login_required
+from app import db
+from app.models import Atencion
+from app.forms import (
     HistoriaMedicaForm,
-    ProgresoAtencionForm,
     NuevosAntecedentesForm,
+    ProgresoAtencionForm,
     NovedadesAtencionForm,
-    DatosInicioPacienteForm,
-    CierreAtencionForm,
+    GenerarReporteForm,
+    CierreAtencionForm
 )
 
-from flask_login import login_required, current_user
-from datetime import datetime
-import json
-import re
-from io import BytesIO
-import logging
-from datetime import datetime, timezone  # Importar timezone
+main_bp = Blueprint('main', __name__)
 
-main = Blueprint("main", __name__)
-
-# Configuración de logging
-logger = logging.getLogger(__name__)
-
-
-@main.route("/")
-@login_required
-def lista_atenciones_route():
-    atenciones = (
-        Atencion.query.filter_by(activa=True).order_by(Atencion.creado_en.desc()).all()
-    )
-    form_cierre_atencion = CierreAtencionForm()
-    form_datos_inicio_paciente = DatosInicioPacienteForm()
-    return render_template(
-        "lista_atenciones_view.html",
-        atenciones=atenciones,
-        form_cierre_atencion=form_cierre_atencion,
-        form_datos_inicio_paciente=form_datos_inicio_paciente,
-    )
-
-
-@main.route("/detalle_atencion_route/<string:atencion_id>", methods=["GET", "POST"])
+# Ruta principal de detalle de atención
+@main_bp.route('/atencion/<int:atencion_id>', methods=['GET'])
 @login_required
 def detalle_atencion_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
-    paciente = atencion.paciente
+    return render_template('detalle_atencion_view.html', atencion=atencion)
 
-    form_historia_medica = HistoriaMedicaForm(prefix="historia")
-    form_progreso_atencion = ProgresoAtencionForm(prefix="detalle")
-    form_nuevos_antecedentes = NuevosAntecedentesForm(prefix="procesar_historia_modal")
-    form_novedades_atencion = NovedadesAtencionForm(prefix="procesar_detalle_modal")
-
-    if form_historia_medica.validate_on_submit() and form_historia_medica.submit.data:
-        paciente.historia = form_historia_medica.historia_medica_text.data
-        db.session.commit()
-        try:
-            guardar_db_asistencia_medica(atencion)
-            flash("Historia y datos AI actualizados correctamente.", "success")
-        except Exception as e:
-            logger.error(f"Error al actualizar información AI: {e}")
-            flash(
-                "Historia actualizada. La información AI no está disponible temporalmente.",
-                "warning",
-            )
-        return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
-
-    elif (
-        form_progreso_atencion.validate_on_submit()
-        and form_progreso_atencion.submit.data
-    ):
-        atencion.detalle = form_progreso_atencion.progreso_atencion_text.data
-        db.session.commit()
-        try:
-            guardar_db_asistencia_medica(atencion)
-            flash(
-                "Detalle de atención y datos AI actualizados correctamente.", "success"
-            )
-        except Exception as e:
-            logger.error(f"Error al actualizar información AI: {e}")
-            flash(
-                "Detalle actualizado. La información AI no está disponible temporalmente.",
-                "warning",
-            )
-        return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
-
-    if request.method == "GET":
-        form_historia_medica.historia_medica_text.data = paciente.historia
-        form_progreso_atencion.progreso_atencion_text.data = atencion.detalle
-
-    return render_template(
-        "detalle_atencion_view.html",
-        atencion=atencion,
-        paciente=paciente,
-        form_historia_medica=form_historia_medica,
-        form_progreso_atencion=form_progreso_atencion,
-        form_nuevos_antecedentes=form_nuevos_antecedentes,
-        form_novedades_atencion=form_novedades_atencion,
-    )
-
-
-@main.route("/nuevos_antecedentes_route/<string:atencion_id>", methods=["POST"])
+# Historia Clínica
+@main_bp.route('/atencion/<int:atencion_id>/historia_clinica', methods=['GET'])
 @login_required
-def nuevos_antecedentes_route(atencion_id):
+def historia_clinica_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
-    paciente = atencion.paciente
+    form_historia_medica = HistoriaMedicaForm()
+    form_historia_medica.historia_medica_text.data = atencion.historia_clinica
+    return render_template('partials/historia_clinica.html', atencion=atencion, form_historia_medica=form_historia_medica)
 
-    # Añadir el prefijo al formulario
-    form_nuevos_antecedentes = NuevosAntecedentesForm(prefix="procesar_historia_modal")
+@main_bp.route('/atencion/<int:atencion_id>/actualizar_historia_clinica', methods=['POST'])
+@login_required
+def actualizar_historia_clinica_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_historia_medica = HistoriaMedicaForm()
+    if form_historia_medica.validate_on_submit():
+        atencion.historia_clinica = form_historia_medica.historia_medica_text.data
+        db.session.commit()
+        if request.headers.get('HX-Request'):
+            flash('Historia clínica actualizada exitosamente.', 'success')
+            return render_template('partials/historia_clinica.html', atencion=atencion, form_historia_medica=form_historia_medica)
+        else:
+            flash('Historia clínica actualizada exitosamente.', 'success')
+            return redirect(url_for('main.detalle_atencion_route', atencion_id=atencion.id))
+    else:
+        return render_template('partials/historia_clinica.html', atencion=atencion, form_historia_medica=form_historia_medica)
+
+# Atención Actual
+@main_bp.route('/atencion/<int:atencion_id>/atencion_actual', methods=['GET'])
+@login_required
+def atencion_actual_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_progreso_atencion = ProgresoAtencionForm()
+    form_progreso_atencion.progreso_atencion_text.data = atencion.progreso_atencion
+    return render_template('partials/atencion_actual.html', atencion=atencion, form_progreso_atencion=form_progreso_atencion)
+
+@main_bp.route('/atencion/<int:atencion_id>/actualizar_atencion_actual', methods=['POST'])
+@login_required
+def actualizar_atencion_actual_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_progreso_atencion = ProgresoAtencionForm()
+    if form_progreso_atencion.validate_on_submit():
+        atencion.progreso_atencion = form_progreso_atencion.progreso_atencion_text.data
+        db.session.commit()
+        if request.headers.get('HX-Request'):
+            flash('Atención actual actualizada exitosamente.', 'success')
+            return render_template('partials/atencion_actual.html', atencion=atencion, form_progreso_atencion=form_progreso_atencion)
+        else:
+            flash('Atención actual actualizada exitosamente.', 'success')
+            return redirect(url_for('main.detalle_atencion_route', atencion_id=atencion.id))
+    else:
+        return render_template('partials/atencion_actual.html', atencion=atencion, form_progreso_atencion=form_progreso_atencion)
+
+# Asistencia IA
+@main_bp.route('/atencion/<int:atencion_id>/asistencia_ia', methods=['GET'])
+@login_required
+def asistencia_ia_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    return render_template('partials/asistencia_ia.html', atencion=atencion)
+
+# Agregar Antecedentes
+@main_bp.route('/atencion/<int:atencion_id>/agregar_antecedentes_modal', methods=['GET'])
+@login_required
+def agregar_antecedentes_modal_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_nuevos_antecedentes = NuevosAntecedentesForm()
+    return render_template('partials/agregar_antecedentes_modal.html', atencion=atencion, form_nuevos_antecedentes=form_nuevos_antecedentes)
+
+@main_bp.route('/atencion/<int:atencion_id>/agregar_antecedentes', methods=['POST'])
+@login_required
+def agregar_antecedentes_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_nuevos_antecedentes = NuevosAntecedentesForm()
     if form_nuevos_antecedentes.validate_on_submit():
-        nuevos_antecedentes_raw = (
-            form_nuevos_antecedentes.nuevos_antecedentes_raw_text.data
-        )
-        historia_actualizada = agregar_nuevos_antecedentes_ia(
-            paciente.historia or "", nuevos_antecedentes_raw
-        )
-        paciente.historia = historia_actualizada.text
+        nuevos_antecedentes = form_nuevos_antecedentes.nuevos_antecedentes_raw_text.data
+        # Supongamos que los antecedentes se agregan al campo 'antecedentes' de la atención
+        atencion.antecedentes = (atencion.antecedentes or "") + "\n" + nuevos_antecedentes
         db.session.commit()
-        flash("Historia procesada y actualizada.", "success")
+        if request.headers.get('HX-Request'):
+            flash('Antecedentes agregados exitosamente.', 'success')
+            # Retornar la sección de Historia Clínica actualizada
+            form_historia_medica = HistoriaMedicaForm()
+            form_historia_medica.historia_medica_text.data = atencion.historia_clinica
+            return render_template('partials/historia_clinica.html', atencion=atencion, form_historia_medica=form_historia_medica)
+        else:
+            flash('Antecedentes agregados exitosamente.', 'success')
+            return redirect(url_for('main.detalle_atencion_route', atencion_id=atencion.id))
     else:
-        # Agregar registro de errores para depuración
-        current_app.logger.error(
-            f"Errores del formulario: {form_nuevos_antecedentes.errors}"
-        )
-        flash("Error al procesar la historia.", "error")
+        return render_template('partials/agregar_antecedentes_modal.html', atencion=atencion, form_nuevos_antecedentes=form_nuevos_antecedentes)
 
-    return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
-
-
-@main.route("/novedades_atencion_route/<string:atencion_id>", methods=["POST"])
+# Agregar Novedades
+@main_bp.route('/atencion/<int:atencion_id>/agregar_novedades_modal', methods=['GET'])
 @login_required
-def novedades_atencion_route(atencion_id):
+def agregar_novedades_modal_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
-    paciente = atencion.paciente
+    form_novedades_atencion = NovedadesAtencionForm()
+    return render_template('partials/agregar_novedades_modal.html', atencion=atencion, form_novedades_atencion=form_novedades_atencion)
 
-    # Añadir el prefijo al formulario
-    form_novedades_atencion = NovedadesAtencionForm(prefix="procesar_detalle_modal")
+@main_bp.route('/atencion/<int:atencion_id>/agregar_novedades', methods=['POST'])
+@login_required
+def agregar_novedades_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_novedades_atencion = NovedadesAtencionForm()
     if form_novedades_atencion.validate_on_submit():
-        novedades_atencion_raw = (
-            form_novedades_atencion.novedades_atencion_raw_text.data
-        )
-        progreso_atencion_actualizado = agregar_novedades_atencion_ia(
-            paciente.historia or "", atencion.detalle or "", novedades_atencion_raw
-        )
-        atencion.detalle = progreso_atencion_actualizado.text
+        novedades = form_novedades_atencion.novedades_atencion_raw_text.data
+        # Supongamos que las novedades se agregan al campo 'novedades_atencion' de la atención
+        atencion.novedades_atencion = (atencion.novedades_atencion or "") + "\n" + novedades
         db.session.commit()
-        flash("Detalle de atención procesado y actualizado.", "success")
+        if request.headers.get('HX-Request'):
+            flash('Novedades agregadas exitosamente.', 'success')
+            # Retornar la sección de Atención Actual actualizada
+            form_progreso_atencion = ProgresoAtencionForm()
+            form_progreso_atencion.progreso_atencion_text.data = atencion.progreso_atencion
+            return render_template('partials/atencion_actual.html', atencion=atencion, form_progreso_atencion=form_progreso_atencion)
+        else:
+            flash('Novedades agregadas exitosamente.', 'success')
+            return redirect(url_for('main.detalle_atencion_route', atencion_id=atencion.id))
     else:
-        # Agregar registro de errores para depuración
-        current_app.logger.error(
-            f"Errores del formulario: {form_novedades_atencion.errors}"
-        )
-        flash("Error al procesar el detalle de atención.", "error")
+        return render_template('partials/agregar_novedades_modal.html', atencion=atencion, form_novedades_atencion=form_novedades_atencion)
 
-    return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
-
-
-@main.route("/extraccion_datos_inicio_paciente_route", methods=["POST"])
+# Generar Reporte Modal
+@main_bp.route('/atencion/<int:atencion_id>/generar_reporte_modal', methods=['GET'])
 @login_required
-def extraccion_datos_inicio_paciente_route():
-    data = request.get_json()
-    texto = data.get("texto")
-
-    if not texto:
-        return jsonify({"error": "Texto no proporcionado"}), 400
-
-    try:
-        resultado = extraer_datos_inicio_paciente_ia(texto)
-        current_app.logger.debug(
-            f"Resultado de procesar_texto_no_estructurado: {resultado}"
-        )
-
-        json_str = extraer_json(resultado.text)
-        datos = json.loads(json_str)
-        run = datos.get("run")
-        nombre = datos.get("nombre")
-        fecha_nacimiento = datos.get("fecha_nacimiento")
-    except ValueError as e:
-        current_app.logger.error(f"Error al extraer JSON: {e}")
-        return jsonify({"error": "Error al interpretar la respuesta del modelo."}), 500
-    except json.JSONDecodeError as e:
-        current_app.logger.error(f"Error al decodificar JSON: {e}")
-        current_app.logger.debug(f"Contenido de JSON: {json_str}")
-        return jsonify({"error": "Error al interpretar la respuesta del modelo."}), 500
-    except Exception as e:
-        current_app.logger.error(f"Error inesperado: {e}")
-        return jsonify({"error": "Error interno del servidor."}), 500
-
-    if not run or not Paciente.validar_run(run):
-        return jsonify({"error": "RUN no válido o no encontrado."}), 400
-
-    if fecha_nacimiento and fecha_nacimiento != "N/A":
-        try:
-            fecha_nacimiento = datetime.strptime(fecha_nacimiento, "%d/%m/%Y").date()
-        except ValueError:
-            return jsonify({"error": "Formato de fecha de nacimiento inválido."}), 400
-    else:
-        fecha_nacimiento = None
-
-    paciente = Paciente.query.filter_by(run=run).first()
-    if not paciente:
-        paciente = Paciente(run=run, nombre=nombre, fecha_nacimiento=fecha_nacimiento)
-        db.session.add(paciente)
-        db.session.commit()
-
-    atencion = Atencion(paciente_id=paciente.id)
-    db.session.add(atencion)
-    db.session.commit()
-
-    return jsonify({"message": "Atención creada exitosamente."}), 200
-
-
-@main.route("/cierre_atencion_route/<string:atencion_id>", methods=["POST"])
-@login_required
-def cierre_atencion_route(atencion_id):
-    form = CierreAtencionForm()
-    if form.validate_on_submit():
-        atencion = Atencion.query.get_or_404(atencion_id)
-        atencion.activa = False
-        atencion.cerrada_en = datetime.utcnow()
-        db.session.commit()
-        flash("Atención cerrada exitosamente.", "success")
-    else:
-        flash("Error al cerrar la atención.", "error")
-    return redirect(url_for("main.lista_atenciones_route"))
-
-
-def register_error_handlers(app):
-    from flask import render_template
-
-    @app.errorhandler(404)
-    def not_found_error(error):
-        return render_template("404.html"), 404
-
-    @app.errorhandler(500)
-    def internal_error(error):
-        db.session.rollback()
-        return render_template("500.html"), 500
-
-    @app.errorhandler(403)
-    def forbidden_error(error):
-        return render_template("403.html"), 403
-
-
-@main.route(
-    "/generar_reporte/<string:atencion_id>/<string:tipo_reporte>", methods=["GET"]
-)
-@login_required
-def generacion_reporte_route(atencion_id, tipo_reporte):
+def generar_reporte_modal_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
-    paciente = atencion.paciente
+    tipos_reporte = ['alta_ambulatoria', 'hospitalizacion', 'interconsulta']
+    form_generar_reporte = GenerarReporteForm()
+    return render_template('partials/generar_reporte_modal.html', atencion=atencion, tipos_reporte=tipos_reporte, form_generar_reporte=form_generar_reporte)
 
-    # Validar el tipo de reporte
-    valid_report_types = ["alta_ambulatoria", "hospitalizacion", "interconsulta"]
-    if tipo_reporte not in valid_report_types:
-        flash("Tipo de reporte no válido.", "danger")
-        return redirect(url_for("main.lista_atenciones_route"))
-
-    # Obtener los datos necesarios
-    historia_conocida = paciente.historia or ""
-    atencion_en_curso = atencion.detalle or ""
-
-    try:
-        # Llamar a la nueva función consolidada para generar el reporte
-        reporte_message = generar_reporte_atencion_ia(
-            historia_conocida, atencion_en_curso, tipo_reporte
-        )
-
-        # Obtener el texto del reporte desde el mensaje de ell
-        reporte_text = reporte_message.text
-
-        # Determinar el título del reporte basado en el tipo
-        titulos = {
-            "alta_ambulatoria": "Reporte de Alta Ambulatoria",
-            "hospitalizacion": "Solicitud de Hospitalización",
-            "interconsulta": "Reporte de Interconsulta",
-        }
-        titulo = titulos.get(tipo_reporte, "Reporte Médico")
-
-        # Renderizar la plantilla con el reporte
-        return render_template(
-            "ver_reporte_view.html",
-            titulo=titulo,
-            reporte=reporte_text,
-            atencion=atencion,
-        )
-    except Exception as e:
-        logger.error(f"Error al generar el reporte: {e}")
-        flash("Ocurrió un error al generar el reporte.", "danger")
-        return redirect(url_for("main.lista_atenciones_route"))
-
-
-# Funciones auxiliares
-
-
-def guardar_db_asistencia_medica(atencion):
-    paciente = atencion.paciente
-
-    logger.info(f"Actualizando información AI para Atención ID: {atencion.id}")
-
-    # Generación de información AI unificada
-    try:
-        asistencia_msg = generar_asistencia_medica_ia(
-            paciente.historia or "", atencion.detalle or ""
-        )
-    except Exception as e:
-        logger.error(f"Error al llamar a la función generar_asistencia_medica: {e}")
-        raise
-
-    # Asignación de los resultados parseados
-    try:
-        atencion.diagnostico_diferencial = "\n".join(
-            asistencia_msg.parsed.diagnostico_diferencial
-        )
-        atencion.manejo_sugerido = asistencia_msg.parsed.manejo_sugerido
-        atencion.proxima_accion = asistencia_msg.parsed.proxima_accion
-        atencion.alertas = "\n".join(asistencia_msg.parsed.alertas)
-    except AttributeError as e:
-        logger.error(f"Error al asignar los resultados de asistencia AI: {e}")
-        raise
-
-    atencion.actualizado_en = datetime.now(timezone.utc)
-    db.session.commit()
-    logger.info(f"Información AI actualizada para Atención ID: {atencion.id}")
-
-
-def obtener_sintesis(detalle, longitud=25):
-    """Obtiene una síntesis breve del detalle de la atención."""
-    return (
-        detalle[:longitud] + "..."
-        if detalle and len(detalle) > longitud
-        else detalle or "Sin detalle"
-    )
-
-
-def extraer_json(respuesta):
-    match = re.search(r"```json(.*?)```", respuesta, re.DOTALL)
-    if match:
-        json_str = match.group(1).strip()
-        return json_str
+@main_bp.route('/atencion/<int:atencion_id>/generar_reporte', methods=['POST'])
+@login_required
+def generar_reporte_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_generar_reporte = GenerarReporteForm()
+    if form_generar_reporte.validate_on_submit():
+        tipo_reporte = form_generar_reporte.tipo_reporte.data
+        # Lógica para generar el reporte basado en tipo_reporte
+        # Por ejemplo, generar un PDF o redirigir a una página de descarga
+        # Aquí simplemente se simula la generación del reporte
+        if request.headers.get('HX-Request'):
+            return jsonify({'message': f'Reporte {tipo_reporte.replace("_", " ").capitalize()} generado exitosamente.'})
+        else:
+            flash(f'Reporte {tipo_reporte.replace("_", " ").capitalize()} generado exitosamente.', 'success')
+            return redirect(url_for('main.detalle_atencion_route', atencion_id=atencion.id))
     else:
-        raise ValueError("No se encontró un bloque JSON en la respuesta.")
+        return render_template('partials/generar_reporte_modal.html', atencion=atencion, tipos_reporte=tipos_reporte, form_generar_reporte=form_generar_reporte)
+
+# Cerrar Atención Modal
+@main_bp.route('/atencion/<int:atencion_id>/cerrar_atencion_modal', methods=['GET'])
+@login_required
+def cerrar_atencion_modal_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_cierre_atencion = CierreAtencionForm()
+    return render_template('partials/cerrar_atencion_modal.html', atencion=atencion, form_cierre_atencion=form_cierre_atencion)
+
+# Cerrar Atención
+@main_bp.route('/atencion/<int:atencion_id>/cerrar', methods=['POST'])
+@login_required
+def cerrar_atencion_route(atencion_id):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    form_cierre_atencion = CierreAtencionForm()
+    if form_cierre_atencion.validate_on_submit():
+        atencion.estado = 'cerrada'
+        db.session.commit()
+        if request.headers.get('HX-Request'):
+            flash('Atención cerrada exitosamente.', 'success')
+            return render_template('partials/atencion_cerrada.html', atencion=atencion)
+        else:
+            flash('Atención cerrada exitosamente.', 'success')
+            return redirect(url_for('main.lista_atenciones_route'))
+    else:
+        return render_template('partials/cerrar_atencion_modal.html', atencion=atencion, form_cierre_atencion=form_cierre_atencion)

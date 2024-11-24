@@ -1,0 +1,23 @@
+<div class="modal-box">
+    <form id="generarReporteForm" method="POST"
+        hx-post="{{ url_for('main.generar_reporte_route', atencion_id=atencion.id) }}" hx-target="#reporteModalContent"
+        hx-swap="innerHTML">
+        {{ form_generar_reporte.hidden_tag() }}
+        <h3 class="font-bold text-lg mb-4">Generar Reporte</h3>
+        <div class="form-control">
+            <label class="label">
+                {{ form_generar_reporte.tipo_reporte.label(class="label-text") }}
+            </label>
+            {{ form_generar_reporte.tipo_reporte(class="select select-bordered") }}
+            {% for error in form_generar_reporte.tipo_reporte.errors %}
+            <label class="label">
+                <span class="label-text-alt text-red-500">{{ error }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="modal-action">
+            <label for="reporteModal" class="btn btn-secondary">Cancelar</label>
+            {{ form_generar_reporte.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>

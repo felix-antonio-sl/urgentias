@@ -1,0 +1,26 @@
+<div class="card shadow-lg bg-base-100 p-4">
+    <form id="atencionActualForm" method="POST"
+        hx-post="{{ url_for('main.actualizar_atencion_actual_route', atencion_id=atencion.id) }}"
+        hx-target="#tabContent" hx-swap="innerHTML">
+        {{ form_progreso_atencion.hidden_tag() }}
+        <div class="form-control">
+            <label class="label">
+                {{ form_progreso_atencion.progreso_atencion_text.label(class="label-text") }}
+            </label>
+            {{ form_progreso_atencion.progreso_atencion_text(class="textarea textarea-bordered", rows=10) }}
+            {% for error in form_progreso_atencion.progreso_atencion_text.errors %}
+            <label class="label">
+                <span class="label-text-alt text-red-500">{{ error }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="flex justify-end mt-4">
+            {{ form_progreso_atencion.submit(class="btn btn-primary mr-2") }}
+            <button type="button" class="btn btn-secondary"
+                hx-get="{{ url_for('main.agregar_novedades_modal_route', atencion_id=atencion.id) }}"
+                hx-target="#detalleBrutoModalContent" hx-swap="innerHTML">
+                <i class="bi bi-arrow-repeat"></i> Agregar Novedades
+            </button>
+        </div>
+    </form>
+</div>

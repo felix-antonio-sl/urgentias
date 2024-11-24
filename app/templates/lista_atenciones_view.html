@@ -2,56 +2,50 @@
 {% import 'macros.html' as macros %}
 {% block title %}Lista de Atenciones{% endblock %}
 {% block content %}
-<div class="container-fluid">
-  <h1 class="mb-4">Lista de Atenciones</h1>
+<div class="container mx-auto">
+  <h1 class="text-3xl font-bold mb-6">Lista de Atenciones</h1>
   <!-- Botón para abrir el modal de creación de atención -->
-  <button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#crearAtencionModal">
+  <label for="crearAtencionModal" class="btn btn-primary modal-button mb-4">
     <i class="bi bi-plus-circle"></i> Nueva Atención
-  </button>
+  </label>
 
   <!-- Modal para Ingreso de Texto No Estructurado -->
-  <div class="modal fade" id="crearAtencionModal" tabindex="-1" aria-labelledby="crearAtencionModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form id="crearAtencionForm">
-          <div class="modal-header">
-            <h5 class="modal-title" id="crearAtencionModalLabel">Ingresar Detalles de la Atención</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            {{ macros.render_form_field(
-              form_datos_inicio_paciente.datos_inicio_paciente_raw_text,
-              attrs={
-                'id': 'textoNoEstructurado',
-                'rows': 5,
-                'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'
-              }
-            ) }}
-            <div id="crearAtencionError" class="text-danger mt-2 d-none"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-primary" id="enviarTextoNoEstructurado">
-              <i class="bi bi-send"></i> Enviar
-            </button>
-          </div>
-        </form>
-      </div>
+  <input type="checkbox" id="crearAtencionModal" class="modal-toggle" />
+  <div class="modal">
+    <div class="modal-box">
+      <form id="crearAtencionForm">
+        <h3 class="font-bold text-lg">Ingresar Detalles de la Atención</h3>
+        {{ macros.render_form_field(
+        form_datos_inicio_paciente.datos_inicio_paciente_raw_text,
+        attrs={
+        'id': 'textoNoEstructurado',
+        'rows': 5,
+        'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento',
+        'class': 'textarea textarea-bordered w-full'
+        }
+        ) }}
+        <div id="crearAtencionError" class="text-red-500 mt-2 hidden"></div>
+        <div class="modal-action">
+          <label for="crearAtencionModal" class="btn">Cancelar</label>
+          <button type="button" class="btn btn-primary" id="enviarTextoNoEstructurado">
+            <i class="bi bi-send"></i> Enviar
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
   <!-- Tabla de Atenciones -->
-  <div class="table-responsive">
-    <table class="table table-hover align-middle">
-      <thead class="table-light">
+  <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
         <tr>
-          <th scope="col">Tiempo</th>
-          <th scope="col">RUN</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Edad</th>
-          <th scope="col">Motivo</th>
-          <th scope="col">Acciones</th>
+          <th>Tiempo</th>
+          <th>RUN</th>
+          <th>Nombre</th>
+          <th>Edad</th>
+          <th>Motivo</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -68,24 +62,27 @@
             {% endif %}
           </td>
           <td>
-            <span data-bs-toggle="tooltip" title="{{ atencion.detalle }}">
+            <span title="{{ atencion.detalle }}">
               {{ atencion.obtener_sintesis(40) }}
             </span>
           </td>
           <td>
             <!-- Botón de Detalles -->
-            <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" class="btn-action btn-action-primary" data-bs-toggle="tooltip" title="Ver Detalles">
+            <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}"
+              class="btn btn-sm btn-primary" title="Ver Detalles">
               <i class="bi bi-eye"></i>
             </a>
             <!-- Botón de Reporte -->
-            <button type="button" class="btn-action btn-action-secondary" data-bs-toggle="modal"
-              data-bs-target="#seleccionarReporteModal" data-atencion-id="{{ atencion.id }}" data-bs-toggle="tooltip" title="Generar Reporte">
+            <label for="seleccionarReporteModal" class="btn btn-sm btn-secondary" data-atencion-id="{{ atencion.id }}"
+              title="Generar Reporte">
               <i class="bi bi-file-earmark-text"></i>
-            </button>
+            </label>
             <!-- Botón de Cerrar -->
-            <form action="{{ url_for('main.cierre_atencion_route', atencion_id=atencion.id) }}" method="POST" style="display:inline;">
+            <form action="{{ url_for('main.cierre_atencion_route', atencion_id=atencion.id) }}" method="POST"
+              class="inline">
               {{ form_cierre_atencion.hidden_tag() }}
-              <button type="submit" class="btn-action btn-action-danger" onclick="return confirm('¿Está seguro de cerrar esta atención?');" data-bs-toggle="tooltip" title="Cerrar Atención">
+              <button type="submit" class="btn btn-sm btn-error"
+                onclick="return confirm('¿Está seguro de cerrar esta atención?');" title="Cerrar Atención">
                 <i class="bi bi-x-circle"></i>
               </button>
             </form>
@@ -97,37 +94,18 @@
   </div>
 
   <!-- Modal de Selección de Tipo de Reporte -->
-  <div class="modal fade" id="seleccionarReporteModal" tabindex="-1" aria-labelledby="seleccionarReporteModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="seleccionarReporteModalLabel">Generar Reporte</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <p>Seleccione el tipo de reporte que desea generar:</p>
-          <ul class="list-group">
-            <li class="list-group-item">
-              <a href="#" class="btn btn-link" data-report-type="alta_ambulatoria">
-                Alta Ambulatoria
-              </a>
-            </li>
-            <li class="list-group-item">
-              <a href="#" class="btn btn-link" data-report-type="hospitalizacion">
-                Hospitalización
-              </a>
-            </li>
-            <li class="list-group-item">
-              <a href="#" class="btn btn-link" data-report-type="interconsulta">
-                Interconsulta
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        </div>
+  <input type="checkbox" id="seleccionarReporteModal" class="modal-toggle" />
+  <div class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Generar Reporte</h3>
+      <p class="py-4">Seleccione el tipo de reporte que desea generar:</p>
+      <div class="flex flex-col space-y-2">
+        <button class="btn btn-outline" data-report-type="alta_ambulatoria">Alta Ambulatoria</button>
+        <button class="btn btn-outline" data-report-type="hospitalizacion">Hospitalización</button>
+        <button class="btn btn-outline" data-report-type="interconsulta">Interconsulta</button>
+      </div>
+      <div class="modal-action">
+        <label for="seleccionarReporteModal" class="btn">Cancelar</label>
       </div>
     </div>
   </div>
@@ -136,21 +114,15 @@
 
 {% block scripts %}
 <script>
-  // Inicializar tooltips
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
-
   // Manejar el envío del formulario de Texto No Estructurado
   document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
     const texto = document.getElementById("textoNoEstructurado").value.trim();
     const errorDiv = document.getElementById("crearAtencionError");
-    errorDiv.classList.add("d-none");
+    errorDiv.classList.add("hidden");
     errorDiv.textContent = "";
     if (!texto) {
       errorDiv.textContent = "El texto no puede estar vacío.";
-      errorDiv.classList.remove("d-none");
+      errorDiv.classList.remove("hidden");
       return;
     }
     fetch("{{ url_for('main.extraccion_datos_inicio_paciente_route') }}", {
@@ -167,26 +139,24 @@
           window.location.reload();
         } else {
           errorDiv.textContent = result.body.error || "Error al procesar el texto.";
-          errorDiv.classList.remove("d-none");
+          errorDiv.classList.remove("hidden");
         }
       })
       .catch(() => {
         errorDiv.textContent = "Error de comunicación con el servidor.";
-        errorDiv.classList.remove("d-none");
+        errorDiv.classList.remove("hidden");
       });
   });
 
   // Script para seleccionar el tipo de reporte y generar la URL
   let currentAtencionId = null;
-  var seleccionarReporteModal = document.getElementById('seleccionarReporteModal');
-  seleccionarReporteModal.addEventListener('show.bs.modal', function (event) {
-    var button = event.relatedTarget;
-    currentAtencionId = button.getAttribute('data-atencion-id');
+  document.querySelectorAll("[data-atencion-id]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      currentAtencionId = this.getAttribute('data-atencion-id');
+    });
   });
-  var reportLinks = seleccionarReporteModal.querySelectorAll('[data-report-type]');
-  reportLinks.forEach(function (link) {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
+  document.querySelectorAll("[data-report-type]").forEach(function (button) {
+    button.addEventListener("click", function () {
       if (!currentAtencionId) {
         alert('Error: No se pudo obtener el ID de la atención.');
         return;

@@ -1,0 +1,22 @@
+<div class="space-y-4">
+    <div class="card shadow-lg bg-base-100 p-4">
+        <h4 class="font-semibold text-lg">Diagnóstico Diferencial</h4>
+        <p>{{ atencion.diagnostico_diferencial or "Información no disponible" }}</p>
+    </div>
+    <div class="card shadow-lg bg-base-100 p-4">
+        <h4 class="font-semibold text-lg">Manejo Sugerido</h4>
+        <p>{{ atencion.manejo_sugerido or "Información no disponible" }}</p>
+    </div>
+    <div class="card shadow-lg bg-base-100 p-4">
+        <h4 class="font-semibold text-lg">Próxima Acción Más Importante</h4>
+        <p class="text-highlight">
+            {{ atencion.proxima_accion or "Información no disponible" }}
+        </p>
+    </div>
+    <div class="card shadow-lg bg-base-100 p-4">
+        <h4 class="font-semibold text-lg">Alertas de Amenazas o Riesgos</h4>
+        <p class="text-error">
+            {{ atencion.alertas or "Información no disponible" }}
+        </p>
+    </div>
+</div>

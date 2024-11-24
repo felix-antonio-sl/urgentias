@@ -1,0 +1,23 @@
+<div class="card shadow-lg bg-base-100 p-4">
+    <form id="historiaClinicaForm" method="POST" hx-post="{{ url_for('main.actualizar_historia_clinica_route', atencion_id=atencion.id) }}" hx-target="#tabContent" hx-swap="innerHTML">
+      {{ form_historia_medica.hidden_tag() }}
+      <div class="form-control">
+        <label class="label">
+          {{ form_historia_medica.historia_medica_text.label(class="label-text") }}
+        </label>
+        {{ form_historia_medica.historia_medica_text(class="textarea textarea-bordered", rows=10) }}
+        {% for error in form_historia_medica.historia_medica_text.errors %}
+          <label class="label">
+            <span class="label-text-alt text-red-500">{{ error }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      <div class="flex justify-end mt-4">
+        {{ form_historia_medica.submit(class="btn btn-primary mr-2") }}
+        <button type="button" class="btn btn-secondary" hx-get="{{ url_for('main.agregar_antecedentes_modal_route', atencion_id=atencion.id) }}" hx-target="#historiaBrutoModalContent" hx-swap="innerHTML">
+          <i class="bi bi-arrow-repeat"></i> Agregar Antecedentes
+        </button>
+      </div>
+    </form>
+  </div>
+  

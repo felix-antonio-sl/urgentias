@@ -2,19 +2,20 @@
 {% import 'macros.html' as macros %}
 {% block title %}Iniciar Sesión{% endblock %}
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-  <div style="max-width: 400px; width: 100%;">
-    <h2 class="mb-4 text-center">Iniciar Sesión</h2>
-    <form method="POST" action="{{ url_for('auth.login') }}">
+<div class="flex items-center justify-center min-h-screen">
+  <div class="w-full max-w-md">
+    <h2 class="text-2xl font-semibold text-center mb-6">Iniciar Sesión</h2>
+    <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-4">
       {{ form.hidden_tag() }}
       {{ macros.render_form_field(form.email) }}
       {{ macros.render_form_field(form.password) }}
       {{ macros.render_form_checkbox(form.remember) }}
       <div>
-        {{ form.submit(class="btn btn-primary w-100") }}
+        {{ form.submit(class="btn btn-primary w-full") }}
       </div>
     </form>
-    <p class="mt-3 text-center">¿No tienes una cuenta? <a href="{{ url_for('auth.register') }}">Regístrate aquí</a>.</p>
+    <p class="mt-4 text-center">¿No tienes una cuenta? <a href="{{ url_for('auth.register') }}"
+        class="link link-primary">Regístrate aquí</a>.</p>
   </div>
 </div>
 {% endblock %}

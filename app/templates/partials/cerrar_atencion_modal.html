@@ -1,0 +1,13 @@
+<div class="modal-box">
+    <form id="cierreAtencionForm" method="POST"
+        hx-post="{{ url_for('main.cerrar_atencion_route', atencion_id=atencion.id) }}"
+        hx-target="#cierreAtencionModalContent" hx-swap="innerHTML">
+        {{ form_cierre_atencion.hidden_tag() }}
+        <h3 class="font-bold text-lg mb-4">Cerrar Atención</h3>
+        <p>¿Está seguro de cerrar esta atención?</p>
+        <div class="modal-action">
+            <label for="cierreAtencionModal" class="btn btn-secondary">Cancelar</label>
+            {{ form_cierre_atencion.submit(class="btn btn-error") }}
+        </div>
+    </form>
+</div>

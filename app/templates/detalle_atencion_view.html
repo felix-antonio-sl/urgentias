@@ -2,170 +2,102 @@
 {% import 'macros.html' as macros %}
 {% block title %}Detalle de Atención{% endblock %}
 {% block content %}
-<div class="container mt-4">
-  <h1 class="mb-5">Atención Actual</h1>
-  <div class="row mb-5">
-    <div class="col-md-4">
-      <h4>RUN</h4>
-      <p>{{ paciente.run }}</p>
+<div class="container mx-auto p-4">
+  <!-- Título de la Página -->
+  <h1 class="text-3xl font-bold mb-6">Atención Actual</h1>
+
+  <!-- Información del Paciente -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="card shadow-lg bg-base-100">
+      <div class="card-body">
+        <h4 class="card-title">RUN</h4>
+        <p>{{ paciente.run }}</p>
+      </div>
     </div>
-    <div class="col-md-4">
-      <h4>Nombre</h4>
-      <p>{{ paciente.nombre or 'N/A' }}</p>
+    <div class="card shadow-lg bg-base-100">
+      <div class="card-body">
+        <h4 class="card-title">Nombre</h4>
+        <p>{{ paciente.nombre or 'N/A' }}</p>
+      </div>
     </div>
-    <div class="col-md-4">
-      <h4>Edad</h4>
-      <p>
-        {% if paciente.edad %}
-        {{ paciente.edad }} años
-        {% else %}
-        N/A
-        {% endif %}
-      </p>
+    <div class="card shadow-lg bg-base-100">
+      <div class="card-body">
+        <h4 class="card-title">Edad</h4>
+        <p>
+          {% if paciente.edad %}
+          {{ paciente.edad }} años
+          {% else %}
+          N/A
+          {% endif %}
+        </p>
+      </div>
     </div>
   </div>
+
   <!-- Pestañas -->
-  <ul class="nav nav-tabs mb-4" id="detalleAtencionTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="historia-tab" data-bs-toggle="tab" data-bs-target="#historia" type="button"
-        role="tab" aria-controls="historia" aria-selected="true">Historia Clínica</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="atencion-tab" data-bs-toggle="tab" data-bs-target="#atencion" type="button"
-        role="tab" aria-controls="atencion" aria-selected="false">Atención Actual</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button" role="tab"
-        aria-controls="ai" aria-selected="false">AsistencIA</button>
-    </li>
-  </ul>
-  <div class="tab-content" id="detalleAtencionTabsContent">
-    <!-- Historia Clínica -->
-    <div class="tab-pane fade show active" id="historia" role="tabpanel" aria-labelledby="historia-tab">
-      <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
-        {{ form_historia_medica.hidden_tag() }}
-        {{ macros.render_form_field(
-          form_historia_medica.historia_medica_text,
-          attrs={'id': 'historiaClinica', 'rows': 10}
-        ) }}
-        <div class="d-flex">
-          {{ form_historia_medica.submit(class="btn btn-primary me-2") }}
-          <!-- Botón para abrir el modal de Historia en Bruto -->
-          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
-            <i class="bi bi-arrow-repeat"></i> Agregar Antecedentes
-          </button>
-        </div>
-      </form>
-    </div>
-    <!-- Atención Actual -->
-    <div class="tab-pane fade" id="atencion" role="tabpanel" aria-labelledby="atencion-tab">
-      <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
-        {{ form_progreso_atencion.hidden_tag() }}
-        {{ macros.render_form_field(
-          form_progreso_atencion.progreso_atencion_text,
-          attrs={'id': 'detalleAtencion', 'rows': 10}
-        ) }}
-        <div class="d-flex">
-          {{ form_progreso_atencion.submit(class="btn btn-primary me-2") }}
-          <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
-          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
-            <i class="bi bi-arrow-repeat"></i> Agregar Novedades
-          </button>
-        </div>
-      </form>
-    </div>
-    <!-- Asistencia AI -->
-    <div class="tab-pane fade" id="ai" role="tabpanel" aria-labelledby="ai-tab">
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <h4>Diagnóstico Diferencial</h4>
-          <p>{{ atencion.diagnostico_diferencial or "Información no disponible" }}</p>
-        </div>
-        <div class="col-md-6">
-          <h4>Manejo Sugerido</h4>
-          <p>{{ atencion.manejo_sugerido or "Información no disponible" }}</p>
-        </div>
-      </div>
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <h4>Próxima Acción Más Importante</h4>
-          <p class="text-highlight">
-            {{ atencion.proxima_accion or "Información no disponible" }}
-          </p>
-        </div>
-        <div class="col-md-6">
-          <h4>Alertas de Amenazas o Riesgos</h4>
-          <p class="text-danger">
-            {{ atencion.alertas or "Información no disponible" }}
-          </p>
-        </div>
-      </div>
-    </div>
+  <div class="tabs">
+    <button class="tab tab-bordered tab-active"
+      hx-get="{{ url_for('main.historia_clinica_route', atencion_id=atencion.id) }}" hx-target="#tabContent"
+      hx-swap="innerHTML">Historia Clínica</button>
+    <button class="tab tab-bordered" hx-get="{{ url_for('main.atencion_actual_route', atencion_id=atencion.id) }}"
+      hx-target="#tabContent" hx-swap="innerHTML">Atención Actual</button>
+    <button class="tab tab-bordered" hx-get="{{ url_for('main.asistencia_ia_route', atencion_id=atencion.id) }}"
+      hx-target="#tabContent" hx-swap="innerHTML">AsistencIA</button>
   </div>
-  <!-- Modales -->
-  <!-- Modal de Historia en Bruto -->
-  <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="POST" action="{{ url_for('main.nuevos_antecedentes_route', atencion_id=atencion.id) }}">
-          {{ form_nuevos_antecedentes.hidden_tag() }}
-          <div class="modal-header">
-            <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Antecedentes</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            {{ macros.render_form_field(
-              form_nuevos_antecedentes.nuevos_antecedentes_raw_text,
-              attrs={'id': 'historiaBruto', 'rows': 5}
-            ) }}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            {{ form_nuevos_antecedentes.submit(class="btn btn-primary") }}
-          </div>
-        </form>
-      </div>
-    </div>
+
+  <!-- Contenido Dinámico de las Tabs -->
+  <div id="tabContent" class="mt-4">
+    <!-- Contenido cargado dinámicamente con htmx -->
+    <p class="text-center text-gray-500">Seleccione una pestaña para ver el contenido.</p>
   </div>
-  <!-- Modal de Detalle de Atención en Bruto -->
-  <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="POST" action="{{ url_for('main.novedades_atencion_route', atencion_id=atencion.id) }}">
-          {{ form_novedades_atencion.hidden_tag() }}
-          <div class="modal-header">
-            <h5 class="modal-title" id="detalleBrutoModalLabel">Actualizar el progreso de la atención</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            {{ macros.render_form_field(
-              form_novedades_atencion.novedades_atencion_raw_text,
-              attrs={'id': 'detalleBruto', 'rows': 5}
-            ) }}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            {{ form_novedades_atencion.submit(class="btn btn-primary") }}
-          </div>
-        </form>
-      </div>
-    </div>
+
+  <!-- Acciones Adicionales -->
+  <div class="mt-6 flex justify-end space-x-2">
+    <!-- Botón para Generar Reporte -->
+    <button class="btn btn-secondary"
+      hx-get="{{ url_for('main.generar_reporte_modal_route', atencion_id=atencion.id) }}"
+      hx-target="#reporteModalContent" hx-swap="innerHTML">
+      <i class="bi bi-file-earmark-text"></i> Generar Reporte
+    </button>
+
+    <!-- Botón para Cerrar Atención -->
+    <button class="btn btn-error" hx-get="{{ url_for('main.cerrar_atencion_modal_route', atencion_id=atencion.id) }}"
+      hx-target="#cierreAtencionModalContent" hx-swap="innerHTML">
+      <i class="bi bi-x-circle"></i> Cerrar Atención
+    </button>
+  </div>
+
+  <!-- Modal para Generar Reporte -->
+  <input type="checkbox" id="reporteModal" class="modal-toggle" />
+  <div class="modal" id="reporteModalContent">
+    <!-- Contenido cargado dinámicamente con htmx -->
+  </div>
+
+  <!-- Modal para Cerrar Atención -->
+  <input type="checkbox" id="cierreAtencionModal" class="modal-toggle" />
+  <div class="modal" id="cierreAtencionModalContent">
+    <!-- Contenido cargado dinámicamente con htmx -->
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  // Inicializar pestañas
-  var triggerTabList = [].slice.call(document.querySelectorAll('#detalleAtencionTabs button'))
-  triggerTabList.forEach(function (triggerEl) {
-    var tabTrigger = new bootstrap.Tab(triggerEl)
-    triggerEl.addEventListener('click', function (event) {
-      event.preventDefault()
-      tabTrigger.show()
-    })
-  })
+  // Cargar la primera pestaña por defecto al cargar la página
+  document.addEventListener('DOMContentLoaded', function () {
+    const activeTab = document.querySelector('.tab-active');
+    if (activeTab) {
+      htmx.trigger(activeTab, 'click');
+    }
+  });
+
+  // Manejar la confirmación antes de cerrar la atención
+  document.body.addEventListener('htmx:beforeRequest', function (evt) {
+    if (evt.detail.verb === 'POST' && evt.target.id === 'cierreAtencionForm') {
+      if (!confirm('¿Está seguro de cerrar esta atención?')) {
+        evt.preventDefault();
+      }
+    }
+  });
 </script>
 {% endblock %}

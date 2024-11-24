@@ -1,0 +1,23 @@
+<div class="modal-box">
+    <form id="agregarNovedadesForm" method="POST"
+        hx-post="{{ url_for('main.agregar_novedades_route', atencion_id=atencion.id) }}" hx-target="#tabContent"
+        hx-swap="innerHTML">
+        {{ form_novedades_atencion.hidden_tag() }}
+        <h3 class="font-bold text-lg mb-4">Actualizar Progreso de Atención</h3>
+        <div class="form-control">
+            <label class="label">
+                {{ form_novedades_atencion.novedades_atencion_raw_text.label(class="label-text") }}
+            </label>
+            {{ form_novedades_atencion.novedades_atencion_raw_text(class="textarea textarea-bordered", rows=5) }}
+            {% for error in form_novedades_atencion.novedades_atencion_raw_text.errors %}
+            <label class="label">
+                <span class="label-text-alt text-red-500">{{ error }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="modal-action">
+            <label for="reporteModal" class="btn btn-secondary">Cancelar</label>
+            {{ form_novedades_atencion.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
