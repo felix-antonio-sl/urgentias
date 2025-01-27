@@ -7,3 +7,6 @@ logdir
 migrations
 .env
 urgentias.sock
+/ell_storage/
+ell.db
+*.db
