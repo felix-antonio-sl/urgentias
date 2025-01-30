@@ -1,56 +1,61 @@
+# app/__init__.py
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from config.config import DevelopmentConfig
 import logging
 from logging.handlers import RotatingFileHandler
 import os
 import ell
-from flask_wtf import CSRFProtect
-from flask_login import LoginManager
+from datetime import datetime
 
+# Importar las extensiones
+from .extensions import db, migrate, login_manager, csrf
 
-db = SQLAlchemy()
-migrate = Migrate()
-login_manager = LoginManager()
-csrf = CSRFProtect()
+# Definición del filtro nl2br
+from markupsafe import Markup, escape
 
-from .models import User, Paciente, Atencion
+def nl2br(value):
+    return Markup("<br>".join(escape(value).split("\n")))
 
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
+# Importar modelos después de definir las extensiones
+# Pero no los importamos aquí para evitar importaciones circulares
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Configuración para aceptar tokens CSRF en los encabezados
-    app.config["WTF_CSRF_HEADERS"] = ["X-CSRFToken"]
-
-    ell.init(store="./logdir", verbose=True, autocommit=True)
-
+    # Inicialización de las extensiones
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    login_manager.login_view = "auth.login"
-    login_manager.login_message_category = "info"
     csrf.init_app(app)
 
-    from .routes.main import main as main_bp
+    login_manager.login_view = "auth.login"
+    login_manager.login_message_category = "info"
 
+    # Inicialización de ell
+    ell.init(
+        store="./ell_storage",
+        autocommit=True,
+        verbose=True,
+        lazy_versioning=True,
+        default_api_params={"temperature": 0.0},
+    )
+
+    # Registrar el filtro nl2br
+    app.jinja_env.filters["nl2br"] = nl2br
+
+    # Registrar los blueprints
+    from .routes.main import main as main_bp
     app.register_blueprint(main_bp)
 
     from .routes.auth import auth as auth_bp
-
     app.register_blueprint(auth_bp)
 
+    # Registrar manejadores de errores
     from .routes.main import register_error_handlers
-
     register_error_handlers(app)
 
+    # Configuración de logging
     if not app.debug and not app.testing:
         if not os.path.exists("logs"):
             os.mkdir("logs")

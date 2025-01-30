@@ -9,145 +9,134 @@ from flask import (
     send_file,
     current_app,
 )
-from .. import db
-from ..models import Paciente, Atencion
-from ..utils import (
-    procesar_historia,
-    procesar_detalle_atencion,
-    procesar_texto_no_estructurado,
+from app.extensions import db
+from app.models import Paciente, Atencion
+from app.utils.main import (
+    agregar_nuevos_antecedentes_ia,
+    agregar_novedades_atencion_ia,
+    extraer_datos_inicio_paciente_ia,
+    generar_reporte_atencion_ia,
+    generar_asistencia_medica_ia,
 )
-from ..forms import (
-    ActualizarHistoriaForm,
-    ActualizarDetalleForm,
-    ProcesarHistoriaBrutoForm,
-    ProcesarDetalleBrutoForm,
-    ProcesarTextoNoEstructuradoForm,  # Asegúrate de importar el formulario
-    CerrarAtencionForm,
+from app.forms import (
+    HistoriaMedicaForm,
+    ProgresoAtencionForm,
+    NuevosAntecedentesForm,
+    NovedadesAtencionForm,
+    DatosInicioPacienteForm,
+    CierreAtencionForm,
 )
 from flask_login import login_required, current_user
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import re
 from io import BytesIO
+import logging
 
 main = Blueprint("main", __name__)
-
-
-def obtener_sintesis(detalle, longitud=25):
-    """Obtiene una síntesis breve del detalle de la atención."""
-    return (
-        detalle[:longitud] + "..."
-        if detalle and len(detalle) > longitud
-        else detalle or "Sin detalle"
-    )
-
+logger = logging.getLogger(__name__)
 
 @main.route("/")
 @login_required
-def lista_atenciones():
+def lista_atenciones_route():
     atenciones = (
         Atencion.query.filter_by(activa=True).order_by(Atencion.creado_en.desc()).all()
     )
-    form_cerrar = CerrarAtencionForm()
-    form_procesar_texto = ProcesarTextoNoEstructuradoForm()
+    form_cierre_atencion = CierreAtencionForm()
+    form_datos_inicio_paciente = DatosInicioPacienteForm()
     return render_template(
-        "atenciones.html",
+        "lista_atenciones_view.html",
         atenciones=atenciones,
-        form_cerrar=form_cerrar,
-        form_procesar_texto=form_procesar_texto,  # Pasa el formulario al template
+        form_cierre_atencion=form_cierre_atencion,
+        form_datos_inicio_paciente=form_datos_inicio_paciente,
     )
 
-
-@main.route("/detalle_atencion/<string:atencion_id>", methods=["GET", "POST"])
+@main.route("/detalle_atencion_route/<string:atencion_id>", methods=["GET", "POST"])
 @login_required
-def detalle_atencion(atencion_id):
+def detalle_atencion_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
-    form_historia = ActualizarHistoriaForm(prefix="historia")
-    form_detalle = ActualizarDetalleForm(prefix="detalle")
-    form_procesar_historia = ProcesarHistoriaBrutoForm(prefix="procesar_historia_modal")
-    form_procesar_detalle = ProcesarDetalleBrutoForm(prefix="procesar_detalle_modal")
+    form_historia_medica = HistoriaMedicaForm(prefix="historia")
+    form_progreso_atencion = ProgresoAtencionForm(prefix="detalle")
+    form_nuevos_antecedentes = NuevosAntecedentesForm(prefix="procesar_historia_modal")
+    form_novedades_atencion = NovedadesAtencionForm(prefix="procesar_detalle_modal")
 
-    if form_historia.validate_on_submit() and form_historia.submit.data:
-        paciente.historia = form_historia.historia.data
+    if form_historia_medica.validate_on_submit() and form_historia_medica.submit.data:
+        paciente.historia = form_historia_medica.historia_medica_text.data
         db.session.commit()
         flash("Historia actualizada correctamente.", "success")
-        return redirect(url_for("main.detalle_atencion", atencion_id=atencion_id))
-    elif form_detalle.validate_on_submit() and form_detalle.submit.data:
-        atencion.detalle = form_detalle.detalle.data
+        return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
+
+    elif form_progreso_atencion.validate_on_submit() and form_progreso_atencion.submit.data:
+        atencion.detalle = form_progreso_atencion.progreso_atencion_text.data
         db.session.commit()
         flash("Detalle de atención actualizado correctamente.", "success")
-        return redirect(url_for("main.detalle_atencion", atencion_id=atencion_id))
+        return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
     if request.method == "GET":
-        form_historia.historia.data = paciente.historia
-        form_detalle.detalle.data = atencion.detalle
+        form_historia_medica.historia_medica_text.data = paciente.historia
+        form_progreso_atencion.progreso_atencion_text.data = atencion.detalle
 
     return render_template(
-        "detalle_atencion.html",
+        "detalle_atencion_view.html",
         atencion=atencion,
         paciente=paciente,
-        form_historia=form_historia,
-        form_detalle=form_detalle,
-        form_procesar_historia=form_procesar_historia,
-        form_procesar_detalle=form_procesar_detalle,
+        form_historia_medica=form_historia_medica,
+        form_progreso_atencion=form_progreso_atencion,
+        form_nuevos_antecedentes=form_nuevos_antecedentes,
+        form_novedades_atencion=form_novedades_atencion,
     )
 
-
-@main.route("/procesar_historia_bruto_modal/<string:atencion_id>", methods=["POST"])
+@main.route("/nuevos_antecedentes_route/<string:atencion_id>", methods=["POST"])
 @login_required
-def procesar_historia_bruto_modal(atencion_id):
+def nuevos_antecedentes_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
-    # Añadir el prefijo al formulario
-    form_procesar_historia = ProcesarHistoriaBrutoForm(prefix="procesar_historia_modal")
-    if form_procesar_historia.validate_on_submit():
-        texto_bruto = form_procesar_historia.historia_bruto.data
-        historia_actualizada = procesar_historia(paciente.historia or "", texto_bruto)
+    form_nuevos_antecedentes = NuevosAntecedentesForm(prefix="procesar_historia_modal")
+    if form_nuevos_antecedentes.validate_on_submit():
+        nuevos_antecedentes_raw = form_nuevos_antecedentes.nuevos_antecedentes_raw_text.data
+        historia_actualizada = agregar_nuevos_antecedentes_ia(
+            paciente.historia or "", nuevos_antecedentes_raw
+        )
         paciente.historia = historia_actualizada.text
         db.session.commit()
         flash("Historia procesada y actualizada.", "success")
     else:
-        # Agregar registro de errores para depuración
         current_app.logger.error(
-            f"Errores del formulario: {form_procesar_historia.errors}"
+            f"Errores del formulario: {form_nuevos_antecedentes.errors}"
         )
         flash("Error al procesar la historia.", "error")
 
-    return redirect(url_for("main.detalle_atencion", atencion_id=atencion_id))
+    return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
-
-@main.route("/procesar_detalle_bruto_modal/<string:atencion_id>", methods=["POST"])
+@main.route("/novedades_atencion_route/<string:atencion_id>", methods=["POST"])
 @login_required
-def procesar_detalle_bruto_modal(atencion_id):
+def novedades_atencion_route(atencion_id):
     atencion = Atencion.query.get_or_404(atencion_id)
     paciente = atencion.paciente
 
-    # Añadir el prefijo al formulario
-    form_procesar_detalle = ProcesarDetalleBrutoForm(prefix="procesar_detalle_modal")
-    if form_procesar_detalle.validate_on_submit():
-        texto_bruto = form_procesar_detalle.detalle_bruto.data
-        detalle_actualizado = procesar_detalle_atencion(
-            paciente.historia or "", atencion.detalle or "", texto_bruto
+    form_novedades_atencion = NovedadesAtencionForm(prefix="procesar_detalle_modal")
+    if form_novedades_atencion.validate_on_submit():
+        novedades_atencion_raw = form_novedades_atencion.novedades_atencion_raw_text.data
+        progreso_atencion_actualizado = agregar_novedades_atencion_ia(
+            paciente.historia or "", atencion.detalle or "", novedades_atencion_raw
         )
-        atencion.detalle = detalle_actualizado.text
+        atencion.detalle = progreso_atencion_actualizado.text
         db.session.commit()
         flash("Detalle de atención procesado y actualizado.", "success")
     else:
-        # Agregar registro de errores para depuración
         current_app.logger.error(
-            f"Errores del formulario: {form_procesar_detalle.errors}"
+            f"Errores del formulario: {form_novedades_atencion.errors}"
         )
         flash("Error al procesar el detalle de atención.", "error")
 
-    return redirect(url_for("main.detalle_atencion", atencion_id=atencion_id))
+    return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
-
-@main.route("/procesar_texto", methods=["POST"])
+@main.route("/extraccion_datos_inicio_paciente_route", methods=["POST"])
 @login_required
-def procesar_texto():
+def extraccion_datos_inicio_paciente_route():
     data = request.get_json()
     texto = data.get("texto")
 
@@ -155,7 +144,7 @@ def procesar_texto():
         return jsonify({"error": "Texto no proporcionado"}), 400
 
     try:
-        resultado = procesar_texto_no_estructurado(texto)
+        resultado = extraer_datos_inicio_paciente_ia(texto)
         current_app.logger.debug(
             f"Resultado de procesar_texto_no_estructurado: {resultado}"
         )
@@ -199,32 +188,10 @@ def procesar_texto():
 
     return jsonify({"message": "Atención creada exitosamente."}), 200
 
-
-def extraer_json(respuesta):
-    match = re.search(r"```json(.*?)```", respuesta, re.DOTALL)
-    if match:
-        json_str = match.group(1).strip()
-        return json_str
-    else:
-        raise ValueError("No se encontró un bloque JSON en la respuesta.")
-
-
-@main.route("/generar_reporte/<string:atencion_id>")
+@main.route("/cierre_atencion_route/<string:atencion_id>", methods=["POST"])
 @login_required
-def generar_reporte(atencion_id):
-    atencion = Atencion.query.get_or_404(atencion_id)
-    pdf = BytesIO()
-    pdf.write(b"%PDF-1.4\n%...")
-    pdf.seek(0)
-    return send_file(
-        pdf, as_attachment=True, download_name="reporte.pdf", mimetype="application/pdf"
-    )
-
-
-@main.route("/cerrar_atencion/<string:atencion_id>", methods=["POST"])
-@login_required
-def cerrar_atencion(atencion_id):
-    form = CerrarAtencionForm()
+def cierre_atencion_route(atencion_id):
+    form = CierreAtencionForm()
     if form.validate_on_submit():
         atencion = Atencion.query.get_or_404(atencion_id)
         atencion.activa = False
@@ -233,8 +200,7 @@ def cerrar_atencion(atencion_id):
         flash("Atención cerrada exitosamente.", "success")
     else:
         flash("Error al cerrar la atención.", "error")
-    return redirect(url_for("main.lista_atenciones"))
-
+    return redirect(url_for("main.lista_atenciones_route"))
 
 def register_error_handlers(app):
     from flask import render_template
@@ -251,3 +217,54 @@ def register_error_handlers(app):
     @app.errorhandler(403)
     def forbidden_error(error):
         return render_template("403.html"), 403
+
+@main.route("/generar_reporte/<string:atencion_id>/<string:tipo_reporte>", methods=["GET"])
+@login_required
+def generacion_reporte_route(atencion_id, tipo_reporte):
+    atencion = Atencion.query.get_or_404(atencion_id)
+    paciente = atencion.paciente
+
+    valid_report_types = ["alta_ambulatoria", "hospitalizacion", "interconsulta"]
+    if tipo_reporte not in valid_report_types:
+        flash("Tipo de reporte no válido.", "danger")
+        return redirect(url_for("main.lista_atenciones_route"))
+
+    historia_conocida = paciente.historia or ""
+    atencion_en_curso = atencion.detalle or ""
+
+    try:
+        reporte_message = generar_reporte_atencion_ia(
+            historia_conocida, atencion_en_curso, tipo_reporte
+        )
+        reporte_text = reporte_message.text
+        titulos = {
+            "alta_ambulatoria": "Reporte de Alta Ambulatoria",
+            "hospitalizacion": "Solicitud de Hospitalización",
+            "interconsulta": "Reporte de Interconsulta",
+        }
+        titulo = titulos.get(tipo_reporte, "Reporte Médico")
+        return render_template(
+            "ver_reporte_view.html",
+            titulo=titulo,
+            reporte=reporte_text,
+            atencion=atencion,
+        )
+    except Exception as e:
+        logger.error(f"Error al generar el reporte: {e}")
+        flash("Ocurrió un error al generar el reporte.", "danger")
+        return redirect(url_for("main.lista_atenciones_route"))
+
+def obtener_sintesis(detalle, longitud=25):
+    return (
+        detalle[:longitud] + "..."
+        if detalle and len(detalle) > longitud
+        else detalle or "Sin detalle"
+    )
+
+def extraer_json(respuesta):
+    match = re.search(r"```json(.*?)```", respuesta, re.DOTALL)
+    if match:
+        json_str = match.group(1).strip()
+        return json_str
+    else:
+        raise ValueError("No se encontró un bloque JSON en la respuesta.")
