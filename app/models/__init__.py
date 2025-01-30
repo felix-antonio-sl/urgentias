@@ -1,10 +1,11 @@
-from . import db
-from datetime import datetime, date, timezone, timedelta
+from datetime import datetime, date, timezone
 import uuid
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
+# Importar db desde extensions
+from app.extensions import db
 
 class Paciente(db.Model):
     __tablename__ = "pacientes"
@@ -14,9 +15,7 @@ class Paciente(db.Model):
     run = db.Column(db.String(12), unique=True, nullable=False)
     fecha_nacimiento = db.Column(db.Date, nullable=True)
     historia = db.Column(db.Text, nullable=True)
-    creado_en = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )  # Actualizado
+    creado_en = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     atenciones = db.relationship("Atencion", backref="paciente", lazy=True)
 
@@ -48,14 +47,12 @@ class Atencion(db.Model):
     activa = db.Column(db.Boolean, default=True)
     detalle = db.Column(db.Text, nullable=True)
     informe_final = db.Column(db.Text, nullable=True)
-    creado_en = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )  # Actualizado
+    creado_en = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     cerrada_en = db.Column(db.DateTime, nullable=True)
     actualizado_en = db.Column(
         db.DateTime,
-        default=lambda: datetime.now(timezone.utc),  # Actualizado
-        onupdate=lambda: datetime.now(timezone.utc),  # Actualizado
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
     # Campos generados por AI
@@ -66,14 +63,8 @@ class Atencion(db.Model):
 
     @property
     def tiempo_desde_creacion(self):
-        now = datetime.now(timezone.utc)
-        creado_en = self.creado_en
-
-        # Si creado_en es naive, asumimos que está en UTC y lo convertimos a aware
-        if creado_en.tzinfo is None:
-            creado_en = creado_en.replace(tzinfo=timezone.utc)
-
-        delta = now - creado_en
+        ahora = datetime.now(timezone.utc)
+        delta = ahora - self.creado_en
         horas, segundos = divmod(delta.total_seconds(), 3600)
         minutos = int((segundos % 3600) // 60)
         return f"{int(horas):02}:{minutos:02}"
@@ -94,7 +85,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     created_at = db.Column(
         db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )  # Actualizado
+    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -104,3 +95,6 @@ class User(UserMixin, db.Model):
 
     def get_id(self):
         return str(self.id)
+
+# Importar los eventos para que sean registrados
+from . import events

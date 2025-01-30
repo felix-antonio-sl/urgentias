@@ -1,0 +1,50 @@
+# Entornos virtuales
+venv/
+env/
+.env
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.sos
+
+# Archivos de base de datos
+*.db
+*.sqlite3
+instance/
+
+# Archivos de logs
+logs/
+*.log
+logdir/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE/editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de configuración local
+.env
+.flaskenv
+
+# Archivos de migración de base de datos
+migrations/
+
+# Archivos específicos del proyecto
+urgentias.sock
+/ell_storage/
+ell.db
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+
+# Archivos de dependencias
+node_modules/
