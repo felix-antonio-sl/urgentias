@@ -161,7 +161,7 @@
       },
       body: JSON.stringify({ texto })
     }).then(response => response.json()
-      .then(data => ({ status: response.status, body: data })))
+      .then(data => ({ status: response.status, body: data }))
       .then(result => {
         if (result.status === 200) {
           window.location.reload();
