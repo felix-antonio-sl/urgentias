@@ -49,7 +49,7 @@ class RegisterForm(FlaskForm):
 
 class DatosInicioPacienteForm(FlaskForm):
     datos_inicio_paciente_raw_text = TextAreaField(
-        "Ingrese Texto", validators=[DataRequired()]
+        "Ingrese texto", validators=[DataRequired()]
     )
     submit = SubmitField("Procesar")
 
