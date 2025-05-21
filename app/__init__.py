@@ -73,4 +73,9 @@ def create_app(config_class=DevelopmentConfig):
         app.logger.setLevel(logging.INFO)
         app.logger.info("Urgentias startup")
 
+    @app.context_processor
+    def inject_current_year():
+        """Agrega el año actual al contexto de las plantillas."""
+        return {"current_year": datetime.now().year}
+
     return app
