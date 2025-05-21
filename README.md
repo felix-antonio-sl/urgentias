@@ -8,8 +8,8 @@ Aplicación web para la gestión y documentación en tiempo real de atenciones e
 ├── app/
 │   ├── __init__.py             # Configuración inicial de la aplicación
 │   ├── forms.py                # Formularios para la interfaz web
-│   ├── models.py               # Modelos de base de datos
-│   ├── prompts/                # Plantillas de prompt para procesamiento de IA
+│   ├── models/               # Modelos de base de datos
+│   ├── static/prompts/                # Plantillas de prompt para procesamiento de IA
 │   ├── routes/                 # Rutas de la aplicación
 │   ├── static/css/styles.css   # Estilos personalizados de la aplicación
 │   ├── templates/              # Plantillas HTML
