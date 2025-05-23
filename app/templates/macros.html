@@ -1,35 +1,30 @@
 {% macro render_form_field(field, attrs={}) %}
-<div class="mb-3">
-  {{ field.label(class="form-label") }}
-  {{ field(class="form-control", **attrs) }}
+<div>
+  {{ field.label }}
+  {{ field(**attrs) }}
   {% if field.errors %}
-  {% for error in field.errors %}
-  <div class="invalid-feedback d-block">{{ error }}</div>
-  {% endfor %}
+    {% for error in field.errors %}
+    <div>{{ error }}</div>
+    {% endfor %}
   {% endif %}
 </div>
 {% endmacro %}
 
 {% macro render_form_checkbox(field, attrs={}) %}
-<div class="mb-3 form-check">
-  {{ field(class="form-check-input", **attrs) }}
-  {{ field.label(class="form-check-label") }}
+<div>
+  {{ field(**attrs) }} {{ field.label }}
   {% if field.errors %}
-  {% for error in field.errors %}
-  <div class="invalid-feedback d-block">{{ error }}</div>
-  {% endfor %}
+    {% for error in field.errors %}
+    <div>{{ error }}</div>
+    {% endfor %}
   {% endif %}
 </div>
 {% endmacro %}
 
 {% macro render_alerts(messages) %}
 {% if messages %}
-{% for category, message in messages %}
-<div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show"
-  role="alert">
-  {{ message }}
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-</div>
-{% endfor %}
+  {% for category, message in messages %}
+  <div>{{ message }}</div>
+  {% endfor %}
 {% endif %}
 {% endmacro %}

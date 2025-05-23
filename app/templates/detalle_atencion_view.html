@@ -2,178 +2,35 @@
 {% import 'macros.html' as macros %}
 {% block title %}Detalle de Atención{% endblock %}
 {% block content %}
-<div class="container mt-4">
-  <h1 class="mb-5">Atención Actual</h1>
-  <div class="row mb-5">
-    <div class="col-md-4">
-      <h4>RUN</h4>
-      <p>{{ paciente.run }}</p>
-    </div>
-    <div class="col-md-4">
-      <h4>Nombre</h4>
-      <p>{{ paciente.nombre or 'N/A' }}</p>
-    </div>
-    <div class="col-md-4">
-      <h4>Edad</h4>
-      <p>
-        {% if paciente.edad %}
-        {{ paciente.edad }} años
-        {% else %}
-        N/A
-        {% endif %}
-      </p>
-    </div>
-  </div>
-  <!-- Pestañas -->
-  <ul class="nav nav-tabs mb-4" id="detalleAtencionTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="historia-tab" data-bs-toggle="tab" data-bs-target="#historia" type="button"
-        role="tab" aria-controls="historia" aria-selected="true">Historia Clínica</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="atencion-tab" data-bs-toggle="tab" data-bs-target="#atencion" type="button"
-        role="tab" aria-controls="atencion" aria-selected="false">Atención Actual</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button" role="tab"
-        aria-controls="ai" aria-selected="false">AsistencIA</button>
-    </li>
-  </ul>
-  <div class="tab-content" id="detalleAtencionTabsContent">
-    <!-- Historia Clínica -->
-    <div class="tab-pane fade show active" id="historia" role="tabpanel" aria-labelledby="historia-tab">
-      <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
-        {{ form_historia_medica.hidden_tag() }}
-        {{ macros.render_form_field(
-          form_historia_medica.historia_medica_text,
-          attrs={'id': 'historiaClinica', 'rows': 10}
-        ) }}
-        <div class="d-flex">
-          {{ form_historia_medica.submit(class="btn btn-primary me-2") }}
-          <!-- Botón para abrir el modal de Historia en Bruto -->
-          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#historiaBrutoModal">
-            <i class="bi bi-arrow-repeat"></i> Agregar Antecedentes
-          </button>
-        </div>
-      </form>
-    </div>
-    <!-- Atención Actual -->
-    <div class="tab-pane fade" id="atencion" role="tabpanel" aria-labelledby="atencion-tab">
-      <form method="POST" action="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}">
-        {{ form_progreso_atencion.hidden_tag() }}
-        {{ macros.render_form_field(
-          form_progreso_atencion.progreso_atencion_text,
-          attrs={'id': 'detalleAtencion', 'rows': 10}
-        ) }}
-        <div class="d-flex">
-          {{ form_progreso_atencion.submit(class="btn btn-primary me-2") }}
-          <!-- Botón para abrir el modal de Detalle de Atención en Bruto -->
-          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#detalleBrutoModal">
-            <i class="bi bi-arrow-repeat"></i> Agregar Novedades
-          </button>
-        </div>
-      </form>
-    </div>
-    <!-- Asistencia AI -->
-    <div class="tab-pane fade" id="ai" role="tabpanel" aria-labelledby="ai-tab">
-      <div class="row mt-4">
-        {% if atencion.diagnostico_diferencial and atencion.manejo_sugerido %}
-          <div class="col-md-6">
-            <h4>Diagnóstico Diferencial</h4>
-            <p>{{ atencion.diagnostico_diferencial }}</p>
-          </div>
-          <div class="col-md-6">
-            <h4>Manejo Sugerido</h4>
-            <p>{{ atencion.manejo_sugerido }}</p>
-          </div>
-        {% else %}
-          <div class="col-12">
-            <div class="alert alert-info">
-              <i class="bi bi-info-circle"></i> La información AI está siendo procesada. Por favor, espere un momento y actualice la página.
-            </div>
-          </div>
-        {% endif %}
-      </div>
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <h4>Próxima Acción Más Importante</h4>
-          <p class="text-highlight">
-            {{ atencion.proxima_accion or "Información no disponible" }}
-          </p>
-        </div>
-        <div class="col-md-6">
-          <h4>Alertas de Amenazas o Riesgos</h4>
-          <p class="text-danger">
-            {{ atencion.alertas or "Información no disponible" }}
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Modales -->
-  <!-- Modal de Historia en Bruto -->
-  <div class="modal fade" id="historiaBrutoModal" tabindex="-1" aria-labelledby="historiaBrutoModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="POST" action="{{ url_for('main.nuevos_antecedentes_route', atencion_id=atencion.id) }}">
-          {{ form_nuevos_antecedentes.hidden_tag() }}
-          <div class="modal-header">
-            <h5 class="modal-title" id="historiaBrutoModalLabel">Procesar Antecedentes</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            {{ macros.render_form_field(
-              form_nuevos_antecedentes.nuevos_antecedentes_raw_text,
-              attrs={'id': 'historiaBruto', 'rows': 5}
-            ) }}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            {{ form_nuevos_antecedentes.submit(class="btn btn-primary") }}
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  <!-- Modal de Detalle de Atención en Bruto -->
-  <div class="modal fade" id="detalleBrutoModal" tabindex="-1" aria-labelledby="detalleBrutoModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="POST" action="{{ url_for('main.novedades_atencion_route', atencion_id=atencion.id) }}">
-          {{ form_novedades_atencion.hidden_tag() }}
-          <div class="modal-header">
-            <h5 class="modal-title" id="detalleBrutoModalLabel">Actualizar el progreso de la atención</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            {{ macros.render_form_field(
-              form_novedades_atencion.novedades_atencion_raw_text,
-              attrs={'id': 'detalleBruto', 'rows': 5}
-            ) }}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            {{ form_novedades_atencion.submit(class="btn btn-primary") }}
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+<h1>Atención Actual</h1>
+<p>RUN: {{ paciente.run }}</p>
+<p>Nombre: {{ paciente.nombre or 'N/A' }}</p>
+<p>Edad: {% if paciente.edad %}{{ paciente.edad }} años{% else %}N/A{% endif %}</p>
+<form hx-post="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" method="POST">
+  {{ form_historia_medica.hidden_tag() }}
+  {{ macros.render_form_field(form_historia_medica.historia_medica_text, attrs={'rows':10}) }}
+  {{ form_historia_medica.submit() }}
+</form>
+<form hx-post="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" method="POST">
+  {{ form_progreso_atencion.hidden_tag() }}
+  {{ macros.render_form_field(form_progreso_atencion.progreso_atencion_text, attrs={'rows':10}) }}
+  {{ form_progreso_atencion.submit() }}
+</form>
+<form hx-post="{{ url_for('main.nuevos_antecedentes_route', atencion_id=atencion.id) }}" method="POST">
+  {{ form_nuevos_antecedentes.hidden_tag() }}
+  {{ macros.render_form_field(form_nuevos_antecedentes.nuevos_antecedentes_raw_text, attrs={'rows':5}) }}
+  {{ form_nuevos_antecedentes.submit() }}
+</form>
+<form hx-post="{{ url_for('main.novedades_atencion_route', atencion_id=atencion.id) }}" method="POST">
+  {{ form_novedades_atencion.hidden_tag() }}
+  {{ macros.render_form_field(form_novedades_atencion.novedades_atencion_raw_text, attrs={'rows':5}) }}
+  {{ form_novedades_atencion.submit() }}
+</form>
+<div>
+  <h2>Asistencia AI</h2>
+  <p>Diagnóstico Diferencial: {{ atencion.diagnostico_diferencial or 'Procesando...' }}</p>
+  <p>Manejo Sugerido: {{ atencion.manejo_sugerido or 'Procesando...' }}</p>
+  <p>Próxima Acción Más Importante: {{ atencion.proxima_accion or 'Procesando...' }}</p>
+  <p>Alertas: {{ atencion.alertas or 'Procesando...' }}</p>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-  // Inicializar pestañas
-  var triggerTabList = [].slice.call(document.querySelectorAll('#detalleAtencionTabs button'))
-  triggerTabList.forEach(function (triggerEl) {
-    var tabTrigger = new bootstrap.Tab(triggerEl)
-    triggerEl.addEventListener('click', function (event) {
-      event.preventDefault()
-      tabTrigger.show()
-    })
-  })
-</script>
 {% endblock %}

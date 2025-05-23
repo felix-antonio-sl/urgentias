@@ -2,200 +2,23 @@
 {% import 'macros.html' as macros %}
 {% block title %}Lista de Atenciones{% endblock %}
 {% block content %}
-<div class="container-fluid">
-  <h1 class="mb-4">Lista de Atenciones</h1>
-  <!-- Botón para abrir el modal de creación de atención -->
-  <button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#crearAtencionModal">
-    <i class="bi bi-plus-circle"></i> Nueva Atención
-  </button>
-
-  <!-- Modal para Ingreso de Texto No Estructurado -->
-  <div class="modal fade" id="crearAtencionModal" tabindex="-1" aria-labelledby="crearAtencionModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form id="crearAtencionForm">
-          <div class="modal-header">
-            <h5 class="modal-title" id="crearAtencionModalLabel">Ingresar Detalles de la Atención</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            {{ macros.render_form_field(
-              form_datos_inicio_paciente.datos_inicio_paciente_raw_text,
-              attrs={
-                'id': 'textoNoEstructurado',
-                'rows': 5,
-                'placeholder': 'Ingrese el RUN, nombre y fecha de nacimiento'
-              }
-            ) }}
-            <div id="crearAtencionError" class="text-danger mt-2 d-none"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-primary" id="enviarTextoNoEstructurado">
-              <i class="bi bi-send"></i> Enviar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tabla de Atenciones -->
-  <div class="table-responsive">
-    <table class="table table-hover align-middle">
-      <thead class="table-light">
-        <tr>
-          <th scope="col">Tiempo</th>
-          <th scope="col">RUN</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Edad</th>
-          <th scope="col">Motivo</th>
-          <th scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for atencion in atenciones %}
-        <tr>
-          <td>{{ atencion.tiempo_desde_creacion }}</td>
-          <td>{{ atencion.paciente.run }}</td>
-          <td>{{ atencion.paciente.nombre or 'N/A' }}</td>
-          <td>
-            {% if atencion.paciente.edad %}
-            {{ atencion.paciente.edad }} años
-            {% else %}
-            N/A
-            {% endif %}
-          </td>
-          <td>
-            <span data-bs-toggle="tooltip" title="{{ atencion.detalle }}">
-              {{ atencion.obtener_sintesis(40) }}
-            </span>
-          </td>
-          <td>
-            <!-- Botón de Detalles -->
-            <a href="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" class="btn-action btn-action-primary" data-bs-toggle="tooltip" title="Ver Detalles">
-              <i class="bi bi-eye"></i>
-            </a>
-            <!-- Botón de Reporte -->
-            <button type="button" class="btn-action btn-action-secondary" data-bs-toggle="modal"
-              data-bs-target="#seleccionarReporteModal" data-atencion-id="{{ atencion.id }}" data-bs-toggle="tooltip" title="Generar Reporte">
-              <i class="bi bi-file-earmark-text"></i>
-            </button>
-            <!-- Botón de Cerrar -->
-            <form action="{{ url_for('main.cierre_atencion_route', atencion_id=atencion.id) }}" method="POST" style="display:inline;">
-              {{ form_cierre_atencion.hidden_tag() }}
-              <button type="submit" class="btn-action btn-action-danger" onclick="return confirm('¿Está seguro de cerrar esta atención?');" data-bs-toggle="tooltip" title="Cerrar Atención">
-                <i class="bi bi-x-circle"></i>
-              </button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Modal de Selección de Tipo de Reporte -->
-  <div class="modal fade" id="seleccionarReporteModal" tabindex="-1" aria-labelledby="seleccionarReporteModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="seleccionarReporteModalLabel">Generar Reporte</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <p>Seleccione el tipo de reporte que desea generar:</p>
-          <ul class="list-group">
-            <li class="list-group-item">
-              <a href="#" class="btn btn-link" data-report-type="alta_ambulatoria">
-                Alta Ambulatoria
-              </a>
-            </li>
-            <li class="list-group-item">
-              <a href="#" class="btn btn-link" data-report-type="hospitalizacion">
-                Hospitalización
-              </a>
-            </li>
-            <li class="list-group-item">
-              <a href="#" class="btn btn-link" data-report-type="interconsulta">
-                Interconsulta
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-  // Inicializar tooltips
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
-
-  // Manejar el envío del formulario de Texto No Estructurado
-  document.getElementById("enviarTextoNoEstructurado").addEventListener("click", function () {
-    const texto = document.getElementById("textoNoEstructurado").value.trim();
-    const errorDiv = document.getElementById("crearAtencionError");
-    errorDiv.classList.add("d-none");
-    errorDiv.textContent = "";
-    if (!texto) {
-      errorDiv.textContent = "El texto no puede estar vacío.";
-      errorDiv.classList.remove("d-none");
-      return;
-    }
-    fetch("{{ url_for('main.extraccion_datos_inicio_paciente_route') }}", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token() }}"
-      },
-      body: JSON.stringify({ texto })
-    }).then(response => response.json()
-      .then(data => ({ status: response.status, body: data }))
-      .then(result => {
-        if (result.status === 200) {
-          window.location.reload();
-        } else {
-          errorDiv.textContent = result.body.error || "Error al procesar el texto.";
-          errorDiv.classList.remove("d-none");
-        }
-      })
-      .catch(() => {
-        errorDiv.textContent = "Error de comunicación con el servidor.";
-        errorDiv.classList.remove("d-none");
-      });
-  });
-
-  // Script para seleccionar el tipo de reporte y generar la URL
-  let currentAtencionId = null;
-  var seleccionarReporteModal = document.getElementById('seleccionarReporteModal');
-  seleccionarReporteModal.addEventListener('show.bs.modal', function (event) {
-    var button = event.relatedTarget;
-    currentAtencionId = button.getAttribute('data-atencion-id');
-  });
-  var reportLinks = seleccionarReporteModal.querySelectorAll('[data-report-type]');
-  reportLinks.forEach(function (link) {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (!currentAtencionId) {
-        alert('Error: No se pudo obtener el ID de la atención.');
-        return;
-      }
-      var tipoReporte = this.getAttribute('data-report-type');
-      var url = "{{ url_for('main.generacion_reporte_route', atencion_id='ATENCION_ID', tipo_reporte='TIPO_REPORTE') }}";
-      url = url.replace('ATENCION_ID', currentAtencionId).replace('TIPO_REPORTE', tipoReporte);
-      window.location.href = url;
-    });
-  });
-</script>
+<h1>Lista de Atenciones</h1>
+<form id="crearAtencionForm" hx-post="{{ url_for('main.extraccion_datos_inicio_paciente_route') }}" hx-target="body" method="POST">
+  {{ form_datos_inicio_paciente.hidden_tag() }}
+  {{ macros.render_form_field(form_datos_inicio_paciente.datos_inicio_paciente_raw_text) }}
+  {{ form_datos_inicio_paciente.submit() }}
+</form>
+<ul>
+{% for atencion in atenciones %}
+  <li>
+    {{ atencion.tiempo_desde_creacion }} - {{ atencion.paciente.run }} - {{ atencion.paciente.nombre or 'N/A' }}
+    <a hx-get="{{ url_for('main.detalle_atencion_route', atencion_id=atencion.id) }}" hx-target="body">Ver</a>
+    <a hx-get="{{ url_for('main.generacion_reporte_route', atencion_id=atencion.id, tipo_reporte='alta_ambulatoria') }}" hx-target="body">Reporte</a>
+    <form hx-post="{{ url_for('main.cierre_atencion_route', atencion_id=atencion.id) }}" method="POST" style="display:inline">
+      {{ form_cierre_atencion.hidden_tag() }}
+      {{ form_cierre_atencion.submit() }}
+    </form>
+  </li>
+{% endfor %}
+</ul>
 {% endblock %}
