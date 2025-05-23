@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from ..forms import LoginForm, RegisterForm
 from ..models import User
-from .. import db
+from .. import data_access as da
 from flask_login import login_user, logout_user, current_user, login_required
 
 auth = Blueprint("auth", __name__, url_prefix="/auth")
@@ -11,7 +11,7 @@ auth = Blueprint("auth", __name__, url_prefix="/auth")
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = da.get_user_by_email(form.email.data)
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember.data)
             flash("Inicio de sesión exitoso.", "success")
@@ -30,14 +30,13 @@ def login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(email=form.email.data).first()
+        existing_user = da.get_user_by_email(form.email.data)
         if existing_user:
             flash("El correo electrónico ya está registrado.", "error")
         else:
             user = User(email=form.email.data)
             user.set_password(form.password.data)
-            db.session.add(user)
-            db.session.commit()
+            user = da.create_user(user.to_dict())
             flash("Registro exitoso. Puedes iniciar sesión ahora.", "success")
             return redirect(url_for("auth.login"))
     return render_template("register.html", form=form)

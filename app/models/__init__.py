@@ -1,68 +1,91 @@
+from dataclasses import dataclass, field
 from datetime import datetime, date, timezone
-import uuid
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
-# Importar db desde extensions
-from app.extensions import db
 
-class Paciente(db.Model):
-    __tablename__ = "pacientes"
+def _parse_datetime(value):
+    if isinstance(value, datetime) or value is None:
+        return value
+    try:
+        return datetime.fromisoformat(value)
+    except Exception:
+        return None
 
-    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    nombre = db.Column(db.String(100), nullable=True)
-    run = db.Column(db.String(12), unique=True, nullable=False)
-    fecha_nacimiento = db.Column(db.Date, nullable=True)
-    historia = db.Column(db.Text, nullable=True)
-    creado_en = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
-    atenciones = db.relationship("Atencion", backref="paciente", lazy=True)
+def _parse_date(value):
+    if isinstance(value, date) or value is None:
+        return value
+    try:
+        return date.fromisoformat(value)
+    except Exception:
+        return None
+
+
+@dataclass
+class Paciente:
+    id: str | None = None
+    nombre: str | None = None
+    run: str | None = None
+    fecha_nacimiento: date | None = None
+    historia: str | None = None
+    creado_en: datetime | None = None
 
     @property
     def edad(self):
         if self.fecha_nacimiento:
             hoy = date.today()
-            return (
-                hoy.year
-                - self.fecha_nacimiento.year
-                - (
-                    (hoy.month, hoy.day)
-                    < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
-                )
+            return hoy.year - self.fecha_nacimiento.year - (
+                (hoy.month, hoy.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
             )
-        else:
-            return None
+        return None
 
     @staticmethod
-    def validar_run(run):
+    def validar_run(run: str) -> bool:
         return bool(re.match(r"^\d{6,8}-[\dkK]$", run))
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "Paciente":
+        return cls(
+            id=data.get("id"),
+            nombre=data.get("nombre"),
+            run=data.get("run"),
+            fecha_nacimiento=_parse_date(data.get("fecha_nacimiento")),
+            historia=data.get("historia"),
+            creado_en=_parse_datetime(data.get("creado_en")),
+        )
 
-class Atencion(db.Model):
-    __tablename__ = "atenciones"
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "run": self.run,
+            "fecha_nacimiento": self.fecha_nacimiento.isoformat() if self.fecha_nacimiento else None,
+            "historia": self.historia,
+            "creado_en": self.creado_en.isoformat() if self.creado_en else None,
+        }
 
-    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    paciente_id = db.Column(db.String, db.ForeignKey("pacientes.id"), nullable=False)
-    activa = db.Column(db.Boolean, default=True)
-    detalle = db.Column(db.Text, nullable=True)
-    informe_final = db.Column(db.Text, nullable=True)
-    creado_en = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    cerrada_en = db.Column(db.DateTime, nullable=True)
-    actualizado_en = db.Column(
-        db.DateTime,
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-    )
 
-    # Campos generados por AI
-    diagnostico_diferencial = db.Column(db.Text, nullable=True)
-    manejo_sugerido = db.Column(db.Text, nullable=True)
-    proxima_accion = db.Column(db.Text, nullable=True)
-    alertas = db.Column(db.Text, nullable=True)
+@dataclass
+class Atencion:
+    id: str | None = None
+    paciente_id: str | None = None
+    activa: bool = True
+    detalle: str | None = None
+    informe_final: str | None = None
+    creado_en: datetime | None = None
+    cerrada_en: datetime | None = None
+    actualizado_en: datetime | None = None
+    diagnostico_diferencial: str | None = None
+    manejo_sugerido: str | None = None
+    proxima_accion: str | None = None
+    alertas: str | None = None
 
     @property
     def tiempo_desde_creacion(self):
+        if not self.creado_en:
+            return "00:00"
         ahora = datetime.now(timezone.utc)
         delta = ahora - self.creado_en
         horas, segundos = divmod(delta.total_seconds(), 3600)
@@ -71,30 +94,73 @@ class Atencion(db.Model):
 
     def obtener_sintesis(self, longitud=150):
         detalle = self.detalle or ""
-        return (
-            detalle[:longitud] + "..."
-            if len(detalle) > longitud
-            else detalle or "Sin detalle"
+        return detalle[:longitud] + "..." if len(detalle) > longitud else detalle or "Sin detalle"
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Atencion":
+        return cls(
+            id=data.get("id"),
+            paciente_id=data.get("paciente_id"),
+            activa=data.get("activa", True),
+            detalle=data.get("detalle"),
+            informe_final=data.get("informe_final"),
+            creado_en=_parse_datetime(data.get("creado_en")),
+            cerrada_en=_parse_datetime(data.get("cerrada_en")),
+            actualizado_en=_parse_datetime(data.get("actualizado_en")),
+            diagnostico_diferencial=data.get("diagnostico_diferencial"),
+            manejo_sugerido=data.get("manejo_sugerido"),
+            proxima_accion=data.get("proxima_accion"),
+            alertas=data.get("alertas"),
         )
 
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "paciente_id": self.paciente_id,
+            "activa": self.activa,
+            "detalle": self.detalle,
+            "informe_final": self.informe_final,
+            "creado_en": self.creado_en.isoformat() if self.creado_en else None,
+            "cerrada_en": self.cerrada_en.isoformat() if self.cerrada_en else None,
+            "actualizado_en": self.actualizado_en.isoformat() if self.actualizado_en else None,
+            "diagnostico_diferencial": self.diagnostico_diferencial,
+            "manejo_sugerido": self.manejo_sugerido,
+            "proxima_accion": self.proxima_accion,
+            "alertas": self.alertas,
+        }
 
-class User(UserMixin, db.Model):
-    __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-    created_at = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
 
-    def set_password(self, password):
+@dataclass
+class User(UserMixin):
+    id: int | None = None
+    email: str | None = None
+    password_hash: str | None = None
+    created_at: datetime | None = None
+
+    def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password: str) -> bool:
+        if not self.password_hash:
+            return False
         return check_password_hash(self.password_hash, password)
 
     def get_id(self):
-        return str(self.id)
+        return str(self.id) if self.id is not None else None
 
-# Importar los eventos para que sean registrados
-from . import events
+    @classmethod
+    def from_dict(cls, data: dict) -> "User":
+        return cls(
+            id=data.get("id"),
+            email=data.get("email"),
+            password_hash=data.get("password_hash"),
+            created_at=_parse_datetime(data.get("created_at")),
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "email": self.email,
+            "password_hash": self.password_hash,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }

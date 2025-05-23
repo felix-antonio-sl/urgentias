@@ -8,9 +8,10 @@ from flask import (
     jsonify,
     send_file,
     current_app,
+    abort,
 )
-from app.extensions import db
 from app.models import Paciente, Atencion
+from app import data_access as da
 from app.utils.main import (
     agregar_nuevos_antecedentes_ia,
     agregar_novedades_atencion_ia,
@@ -39,9 +40,7 @@ logger = logging.getLogger(__name__)
 @main.route("/")
 @login_required
 def lista_atenciones_route():
-    atenciones = (
-        Atencion.query.filter_by(activa=True).order_by(Atencion.creado_en.desc()).all()
-    )
+    atenciones = da.get_active_atenciones()
     form_cierre_atencion = CierreAtencionForm()
     form_datos_inicio_paciente = DatosInicioPacienteForm()
     return render_template(
@@ -54,8 +53,10 @@ def lista_atenciones_route():
 @main.route("/detalle_atencion_route/<string:atencion_id>", methods=["GET", "POST"])
 @login_required
 def detalle_atencion_route(atencion_id):
-    atencion = Atencion.query.get_or_404(atencion_id)
-    paciente = atencion.paciente
+    atencion = da.get_atencion(atencion_id)
+    if not atencion:
+        abort(404)
+    paciente = da.get_paciente(atencion.paciente_id)
 
     form_historia_medica = HistoriaMedicaForm(prefix="historia")
     form_progreso_atencion = ProgresoAtencionForm(prefix="detalle")
@@ -64,13 +65,13 @@ def detalle_atencion_route(atencion_id):
 
     if form_historia_medica.validate_on_submit() and form_historia_medica.submit.data:
         paciente.historia = form_historia_medica.historia_medica_text.data
-        db.session.commit()
+        da.update_paciente(paciente.id, {"historia": paciente.historia})
         flash("Historia actualizada correctamente.", "success")
         return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
     elif form_progreso_atencion.validate_on_submit() and form_progreso_atencion.submit.data:
         atencion.detalle = form_progreso_atencion.progreso_atencion_text.data
-        db.session.commit()
+        da.update_atencion(atencion.id, {"detalle": atencion.detalle})
         flash("Detalle de atención actualizado correctamente.", "success")
         return redirect(url_for("main.detalle_atencion_route", atencion_id=atencion_id))
 
@@ -91,8 +92,10 @@ def detalle_atencion_route(atencion_id):
 @main.route("/nuevos_antecedentes_route/<string:atencion_id>", methods=["POST"])
 @login_required
 def nuevos_antecedentes_route(atencion_id):
-    atencion = Atencion.query.get_or_404(atencion_id)
-    paciente = atencion.paciente
+    atencion = da.get_atencion(atencion_id)
+    if not atencion:
+        abort(404)
+    paciente = da.get_paciente(atencion.paciente_id)
 
     form_nuevos_antecedentes = NuevosAntecedentesForm(prefix="procesar_historia_modal")
     if form_nuevos_antecedentes.validate_on_submit():
@@ -101,7 +104,7 @@ def nuevos_antecedentes_route(atencion_id):
             paciente.historia or "", nuevos_antecedentes_raw
         )
         paciente.historia = historia_actualizada.text
-        db.session.commit()
+        da.update_paciente(paciente.id, {"historia": paciente.historia})
         flash("Historia procesada y actualizada.", "success")
     else:
         current_app.logger.error(
@@ -114,8 +117,10 @@ def nuevos_antecedentes_route(atencion_id):
 @main.route("/novedades_atencion_route/<string:atencion_id>", methods=["POST"])
 @login_required
 def novedades_atencion_route(atencion_id):
-    atencion = Atencion.query.get_or_404(atencion_id)
-    paciente = atencion.paciente
+    atencion = da.get_atencion(atencion_id)
+    if not atencion:
+        abort(404)
+    paciente = da.get_paciente(atencion.paciente_id)
 
     form_novedades_atencion = NovedadesAtencionForm(prefix="procesar_detalle_modal")
     if form_novedades_atencion.validate_on_submit():
@@ -124,7 +129,7 @@ def novedades_atencion_route(atencion_id):
             paciente.historia or "", atencion.detalle or "", novedades_atencion_raw
         )
         atencion.detalle = progreso_atencion_actualizado.text
-        db.session.commit()
+        da.update_atencion(atencion.id, {"detalle": atencion.detalle})
         flash("Detalle de atención procesado y actualizado.", "success")
     else:
         current_app.logger.error(
@@ -176,15 +181,15 @@ def extraccion_datos_inicio_paciente_route():
     else:
         fecha_nacimiento = None
 
-    paciente = Paciente.query.filter_by(run=run).first()
+    paciente = da.get_paciente_by_run(run)
     if not paciente:
-        paciente = Paciente(run=run, nombre=nombre, fecha_nacimiento=fecha_nacimiento)
-        db.session.add(paciente)
-        db.session.commit()
+        paciente = da.create_paciente({
+            "run": run,
+            "nombre": nombre,
+            "fecha_nacimiento": fecha_nacimiento.isoformat() if fecha_nacimiento else None,
+        })
 
-    atencion = Atencion(paciente_id=paciente.id)
-    db.session.add(atencion)
-    db.session.commit()
+    atencion = da.create_atencion({"paciente_id": paciente.id})
 
     return jsonify({"message": "Atención creada exitosamente."}), 200
 
@@ -193,10 +198,12 @@ def extraccion_datos_inicio_paciente_route():
 def cierre_atencion_route(atencion_id):
     form = CierreAtencionForm()
     if form.validate_on_submit():
-        atencion = Atencion.query.get_or_404(atencion_id)
+        atencion = da.get_atencion(atencion_id)
+        if not atencion:
+            abort(404)
         atencion.activa = False
         atencion.cerrada_en = datetime.utcnow()
-        db.session.commit()
+        da.update_atencion(atencion.id, {"activa": False, "cerrada_en": atencion.cerrada_en.isoformat()})
         flash("Atención cerrada exitosamente.", "success")
     else:
         flash("Error al cerrar la atención.", "error")
@@ -211,7 +218,6 @@ def register_error_handlers(app):
 
     @app.errorhandler(500)
     def internal_error(error):
-        db.session.rollback()
         return render_template("500.html"), 500
 
     @app.errorhandler(403)
@@ -221,8 +227,10 @@ def register_error_handlers(app):
 @main.route("/generar_reporte/<string:atencion_id>/<string:tipo_reporte>", methods=["GET"])
 @login_required
 def generacion_reporte_route(atencion_id, tipo_reporte):
-    atencion = Atencion.query.get_or_404(atencion_id)
-    paciente = atencion.paciente
+    atencion = da.get_atencion(atencion_id)
+    if not atencion:
+        abort(404)
+    paciente = da.get_paciente(atencion.paciente_id)
 
     valid_report_types = ["alta_ambulatoria", "hospitalizacion", "interconsulta"]
     if tipo_reporte not in valid_report_types:

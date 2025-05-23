@@ -4,11 +4,11 @@ from config.config import DevelopmentConfig
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-import ell
 from datetime import datetime
 
 # Importar las extensiones
-from .extensions import db, migrate, login_manager, csrf
+from .extensions import login_manager, csrf
+from .supabase_client import get_supabase
 
 # Definición del filtro nl2br
 from markupsafe import Markup, escape
@@ -24,15 +24,21 @@ def create_app(config_class=DevelopmentConfig):
     app.config.from_object(config_class)
 
     # Inicialización de las extensiones
-    db.init_app(app)
-    migrate.init_app(app, db)
     login_manager.init_app(app)
     csrf.init_app(app)
 
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        from .data_access import get_user_by_id
+
+        user = get_user_by_id(user_id)
+        return user
+
     # Inicialización de ell
+    import ell
     ell.init(
         store="./ell_storage",
         autocommit=True,

@@ -1,5 +1,3 @@
-from sqlalchemy import event
-from app.extensions import db
 from . import Paciente, Atencion
 from ..utils import generar_asistencia_medica_ia
 import logging
@@ -35,14 +33,13 @@ def actualizar_asistencia_medica(atencion):
     except Exception as e:
         logger.error(f"Error al actualizar asistencia médica para Atencion ID {atencion.id}: {e}", exc_info=True)
 
-@event.listens_for(Paciente.historia, 'set')
-def historia_changed(target, value, oldvalue, initiator):
+def historia_changed(target, value, oldvalue):
     if value != oldvalue:
-        for atencion in target.atenciones:
+        for atencion in getattr(target, "atenciones", []):
             if atencion.activa:
                 actualizar_asistencia_medica(atencion)
 
-@event.listens_for(Atencion.detalle, 'set')
-def detalle_changed(target, value, oldvalue, initiator):
-    if value != oldvalue and target.activa:
+
+def detalle_changed(target, value, oldvalue):
+    if value != oldvalue and getattr(target, "activa", False):
         actualizar_asistencia_medica(target)
