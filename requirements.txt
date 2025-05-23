@@ -16,3 +16,4 @@ psutil==5.9.8
 python-dotenv==1.0.1
 SQLAlchemy==2.0.36
 WTForms==3.2.1
+supabase==2.2.1

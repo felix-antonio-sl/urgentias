@@ -34,7 +34,6 @@ class NovedadesAtencionForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField("Correo Electrónico", validators=[DataRequired(), Email()])
     password = PasswordField("Contraseña", validators=[DataRequired()])
-    remember = BooleanField("Recordarme")
     submit = SubmitField("Iniciar Sesión")
 
 

@@ -1,5 +1,17 @@
 import os
-import ell
+try:
+    import ell
+except Exception:  # pragma: no cover - optional during tests
+    class _DummyEll:
+        def complex(self, *args, **kwargs):
+            def _decorator(func):
+                return func
+            return _decorator
+
+        def user(self, *args, **kwargs):
+            return ""
+
+    ell = _DummyEll()
 import json
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
