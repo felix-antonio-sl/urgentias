@@ -96,5 +96,10 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return str(self.id)
 
-# Importar los eventos para que sean registrados
-from . import events
+# Importar los eventos para que sean registrados. Si las dependencias de
+# `events` no están disponibles (por ejemplo `ell`), omitimos la importación
+# para permitir el uso de los modelos en entornos de prueba simples.
+try:
+    from . import events  # type: ignore
+except Exception:  # pragma: no cover - eventos son opcionales
+    events = None
