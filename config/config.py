@@ -13,6 +13,10 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+    LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
+    DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
     PROMPT_DIR = os.path.join(basedir, "..", "app", "static", "prompts")
 
 
