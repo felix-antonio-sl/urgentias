@@ -1,11 +1,7 @@
 {% extends "base.html" %}
-
 {% block title %}Página No Encontrada{% endblock %}
-
 {% block content %}
-<div class="container text-center mt-5">
-  <h2>404 - Página No Encontrada</h2>
-  <p>Lo sentimos, la página que buscas no existe.</p>
-  <a href="{{ url_for('main.lista_atenciones_route') }}" class="btn btn-primary">Volver al inicio</a>
-</div>
+<h2>404 - Página No Encontrada</h2>
+<p>Lo sentimos, la página que buscas no existe.</p>
+<a hx-get="{{ url_for('main.lista_atenciones_route') }}" hx-target="body">Volver al inicio</a>
 {% endblock %}
