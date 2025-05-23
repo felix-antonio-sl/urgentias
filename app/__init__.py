@@ -4,7 +4,6 @@ from config.config import DevelopmentConfig
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-import ell
 from datetime import datetime
 
 # Importar las extensiones
@@ -31,15 +30,6 @@ def create_app(config_class=DevelopmentConfig):
 
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
-
-    # Inicialización de ell
-    ell.init(
-        store="./ell_storage",
-        autocommit=True,
-        verbose=True,
-        lazy_versioning=True,
-        default_api_params={"temperature": 0.0},
-    )
 
     # Registrar el filtro nl2br
     app.jinja_env.filters["nl2br"] = nl2br

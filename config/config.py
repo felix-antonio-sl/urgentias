@@ -13,6 +13,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+    DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", OPENAI_API_KEY)
+    DEEPSEEK_API_BASE = os.getenv("DEEPSEEK_API_BASE")
+    DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
     PROMPT_DIR = os.path.join(basedir, "..", "app", "static", "prompts")
 
 
